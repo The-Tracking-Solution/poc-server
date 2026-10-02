@@ -1,0 +1,86 @@
+{
+  "TK": {
+    "internal_group": "topkeys",
+    "buttons": [
+      "TK1",
+      "TK2",
+      "TK3",
+      "TK4",
+      "TK5",
+      "TK6",
+      "TK7",
+      "TK8"
+    ],
+    "note": "TK7 en TK8 zijn rotary-controls"
+  },
+  "NK": {
+    "internal_group": "navkeys",
+    "buttons": [
+      "OK",
+      "P1",
+      "P2",
+      "P3",
+      "P4",
+      "UP",
+      "DOWN",
+      "LEFT",
+      "RIGHT"
+    ]
+  },
+  "LK": {
+    "internal_group": "leftkeys",
+    "buttons": [
+      "TL1",
+      "TL2",
+      "TL3",
+      "TL4",
+      "TL5",
+      "TL6"
+    ]
+  },
+  "RK": {
+    "internal_group": "rightkeys",
+    "buttons": [
+      "TR1",
+      "TR2",
+      "TR3",
+      "TR4",
+      "TR5",
+      "TR6"
+    ]
+  },
+  "SK": {
+    "internal_group": "display.softkeys",
+    "buttons": [
+      "SK1",
+      "SK2",
+      "SK3"
+    ]
+  },
+  "SR": {
+    "internal_group": "softradio",
+    "buttons": [
+      "SR1",
+      "SR2",
+      "SR3"
+    ]
+  },
+  "KB": {
+    "internal_group": "keyboard",
+    "buttons": [
+      "0",
+      "1",
+      "2",
+      "3",
+      "4",
+      "5",
+      "6",
+      "7",
+      "8",
+      "9",
+      "#",
+      "*",
+      "KEY_13"
+    ]
+  }
+}

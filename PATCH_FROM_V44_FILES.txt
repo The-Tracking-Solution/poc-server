@@ -1,0 +1,37 @@
+Changed/new files from V44:
+RELEASE_V46_CUMULATIVE_FROM_V44.md
+RELEASE_V45_ADMIN_TEST_AUDIO_PARROT_EMERGENCY.md
+ui_radio/views.py
+engine_poc/views.py
+engine_poc/serializers.py
+engine_poc/livekit_media.py
+engine_poc/urls.py
+engine_radio/forms.py
+engine_radio/admin.py
+engine_radio/hardware_defaults.py
+engine_radio/models.py
+engine_main/tests/test_architecture.py
+engine_main/templates/engine_main/select_identity.html
+engine_main/templates/engine_main/select_tenant.html
+engine_main/static/engine_main/selection.css
+engine_radio/migrations/0003_default_hardware_configs.py
+engine_radio/migrations/0002_hardware_to_hardware_config.py
+engine_radio/tests/test_hardware_defaults.py
+engine_poc/migrations/0004_rename_echo_channel_to_test_audio.py
+engine_poc/services/radio_actions.py
+engine_poc/tests/test_relations.py
+engine_poc/tests/test_test_tenant_seed.py
+engine_poc/tests/test_livekit_media.py
+engine_poc/management/commands/verify_test_tenant.py
+engine_poc/management/commands/setup_test_tenant.py
+ui_radio/tests/test_config_overrides.py
+ui_radio/tests/test_admin.py
+ui_radio/templates/ui_radio/tenant_screen.html
+ui_radio/templates/ui_radio/radio.html
+ui_radio/static/ui_radio/tenant_screen.css
+ui_radio/static/ui_radio/tenant_actions.js
+ui_radio/static/ui_radio/livekit_media.js
+ui_radio/static/ui_radio/tenant_screen.js
+
+Removed files:
+(none)

@@ -1,0 +1,556 @@
+{
+  "type": "detail",
+  "theme": {
+    "icon_family": "material-symbols-outlined",
+    "contrast_mode": "auto",
+    "dark_text_color": "#000000",
+    "light_text_color": "#ffffff",
+    "default_button_color": "#3a3d40"
+  },
+  "title": "Radio",
+  "display": {
+    "usemode": "visible",
+    "softkeys": {
+      "keys": {
+        "sk1": {
+          "color": "#e4e4e4",
+          "hw_key": "1",
+          "short_action": "none",
+          "label_primary": {
+            "type": "text",
+            "value": "sk1"
+          },
+          "short_action_params": {}
+        },
+        "sk2": {
+          "color": "#e4e4e4",
+          "hw_key": "2",
+          "short_action": "none",
+          "label_primary": {
+            "type": "text",
+            "value": "sk2"
+          },
+          "short_action_params": {}
+        },
+        "sk3": {
+          "color": "#e4e4e4",
+          "hw_key": "3",
+          "short_action": "none",
+          "label_primary": {
+            "type": "text",
+            "value": "sk3"
+          },
+          "short_action_params": {}
+        }
+      },
+      "usemode": "visible",
+      "default_color": "#e4e4e4"
+    },
+    "default_screen_type": "detail"
+  },
+  "navkeys": {
+    "keys": {
+      "ok": {
+        "color": "#3a3d40",
+        "hw_key": "Enter",
+        "short_action": "selection_select",
+        "label_primary": {
+          "type": "text",
+          "value": "OK"
+        },
+        "short_action_params": {},
+        "label_secondary": "Selecteer"
+      },
+      "p1": {
+        "color": "#3a3d40",
+        "hw_key": "F1",
+        "short_action": "screen_open",
+        "label_primary": {
+          "type": "text",
+          "value": "F1"
+        },
+        "short_action_params": {
+          "screen": "screen_list"
+        },
+        "label_secondary": "Menu"
+      },
+      "p2": {
+        "color": "#3a3d40",
+        "hw_key": "F2",
+        "short_action": "screen_back",
+        "label_primary": {
+          "type": "text",
+          "value": "F2"
+        },
+        "short_action_params": {},
+        "label_secondary": "Retour"
+      },
+      "p3": {
+        "color": "#3a3d40",
+        "hw_key": "",
+        "short_action": "none",
+        "label_primary": {
+          "type": "text",
+          "value": "F3"
+        },
+        "short_action_params": {}
+      },
+      "p4": {
+        "color": "#3a3d40",
+        "hw_key": "",
+        "short_action": "none",
+        "label_primary": {
+          "type": "text",
+          "value": "F4"
+        },
+        "short_action_params": {}
+      },
+      "up": {
+        "color": "#3a3d40",
+        "hw_key": "ArrowUp",
+        "short_action": "selection_up",
+        "label_primary": {
+          "type": "icon",
+          "value": "keyboard_arrow_up"
+        },
+        "short_action_params": {}
+      },
+      "down": {
+        "color": "#3a3d40",
+        "hw_key": "ArrowDown",
+        "short_action": "selection_down",
+        "label_primary": {
+          "type": "icon",
+          "value": "keyboard_arrow_down"
+        },
+        "short_action_params": {}
+      },
+      "left": {
+        "color": "#3a3d40",
+        "hw_key": "ArrowLeft",
+        "short_action": "selection_left",
+        "label_primary": {
+          "type": "icon",
+          "value": "keyboard_arrow_left"
+        },
+        "short_action_params": {}
+      },
+      "right": {
+        "color": "#3a3d40",
+        "hw_key": "ArrowRight",
+        "short_action": "selection_right",
+        "label_primary": {
+          "type": "icon",
+          "value": "keyboard_arrow_right"
+        },
+        "short_action_params": {}
+      }
+    },
+    "usemode": "visible",
+    "default_color": "#3a3d40"
+  },
+  "primary": "Gereed",
+  "topkeys": {
+    "keys": {
+      "tk1": {
+        "color": "#3a3d40",
+        "hw_key": "F5",
+        "short_action": "none",
+        "label_primary": {
+          "type": "text",
+          "value": "TK1"
+        },
+        "short_action_params": {}
+      },
+      "tk2": {
+        "color": "#3a3d40",
+        "hw_key": "F6",
+        "short_action": "none",
+        "label_primary": {
+          "type": "text",
+          "value": "TK2"
+        },
+        "short_action_params": {}
+      },
+      "tk3": {
+        "color": "#3a3d40",
+        "hw_key": "F7",
+        "short_action": "none",
+        "label_primary": {
+          "type": "text",
+          "value": "TK3"
+        },
+        "short_action_params": {}
+      },
+      "tk4": {
+        "color": "#3a3d40",
+        "hw_key": "F8",
+        "short_action": "none",
+        "label_primary": {
+          "type": "text",
+          "value": "TK4"
+        },
+        "short_action_params": {}
+      },
+      "tk5": {
+        "color": "#3a3d40",
+        "hw_key": "F9",
+        "short_action": "none",
+        "label_primary": {
+          "type": "text",
+          "value": "TK5"
+        },
+        "short_action_params": {}
+      },
+      "tk6": {
+        "color": "#3a3d40",
+        "hw_key": "F10",
+        "short_action": "none",
+        "label_primary": {
+          "type": "text",
+          "value": "TK6"
+        },
+        "short_action_params": {}
+      },
+      "tk7": {
+        "type": "rotary",
+        "color": "#3a3d40",
+        "label_primary": {
+          "type": "text",
+          "value": "TK7"
+        },
+        "hw_key_clockwise": "",
+        "short_action_clockwise": "none",
+        "hw_key_counter_clockwise": "",
+        "short_action_params_clockwise": {},
+        "short_action_counter_clockwise": "none",
+        "short_action_params_counter_clockwise": {}
+      },
+      "tk8": {
+        "type": "rotary",
+        "color": "#3a3d40",
+        "label_primary": {
+          "type": "text",
+          "value": "TK8"
+        },
+        "hw_key_clockwise": "",
+        "short_action_clockwise": "none",
+        "hw_key_counter_clockwise": "",
+        "short_action_params_clockwise": {},
+        "short_action_counter_clockwise": "none",
+        "short_action_params_counter_clockwise": {}
+      }
+    },
+    "usemode": "visible",
+    "default_color": "#3a3d40"
+  },
+  "usemode": "softradio",
+  "keyboard": {
+    "keys": {
+      "0": {
+        "color": "#3a3d40",
+        "hw_key": "",
+        "short_action": "none",
+        "label_primary": {
+          "type": "text",
+          "value": "0"
+        },
+        "short_action_params": {}
+      },
+      "1": {
+        "color": "#3a3d40",
+        "hw_key": "",
+        "short_action": "none",
+        "label_primary": {
+          "type": "text",
+          "value": "1"
+        },
+        "short_action_params": {}
+      },
+      "2": {
+        "color": "#3a3d40",
+        "hw_key": "",
+        "short_action": "none",
+        "label_primary": {
+          "type": "text",
+          "value": "2"
+        },
+        "short_action_params": {}
+      },
+      "3": {
+        "color": "#3a3d40",
+        "hw_key": "",
+        "short_action": "none",
+        "label_primary": {
+          "type": "text",
+          "value": "3"
+        },
+        "short_action_params": {}
+      },
+      "4": {
+        "color": "#3a3d40",
+        "hw_key": "",
+        "short_action": "none",
+        "label_primary": {
+          "type": "text",
+          "value": "4"
+        },
+        "short_action_params": {}
+      },
+      "5": {
+        "color": "#3a3d40",
+        "hw_key": "",
+        "short_action": "none",
+        "label_primary": {
+          "type": "text",
+          "value": "5"
+        },
+        "short_action_params": {}
+      },
+      "6": {
+        "color": "#3a3d40",
+        "hw_key": "",
+        "short_action": "none",
+        "label_primary": {
+          "type": "text",
+          "value": "6"
+        },
+        "short_action_params": {}
+      },
+      "7": {
+        "color": "#3a3d40",
+        "hw_key": "",
+        "short_action": "none",
+        "label_primary": {
+          "type": "text",
+          "value": "7"
+        },
+        "short_action_params": {}
+      },
+      "8": {
+        "color": "#3a3d40",
+        "hw_key": "",
+        "short_action": "none",
+        "label_primary": {
+          "type": "text",
+          "value": "8"
+        },
+        "short_action_params": {}
+      },
+      "9": {
+        "color": "#3a3d40",
+        "hw_key": "",
+        "short_action": "none",
+        "label_primary": {
+          "type": "text",
+          "value": "9"
+        },
+        "short_action_params": {}
+      },
+      "hash": {
+        "color": "#3a3d40",
+        "hw_key": "",
+        "short_action": "none",
+        "label_primary": {
+          "type": "text",
+          "value": "#"
+        },
+        "short_action_params": {}
+      },
+      "star": {
+        "color": "#3a3d40",
+        "hw_key": "",
+        "short_action": "none",
+        "label_primary": {
+          "type": "text",
+          "value": "*"
+        },
+        "short_action_params": {}
+      },
+      "key_13": {
+        "color": "#3a3d40",
+        "hw_key": "",
+        "short_action": "none",
+        "label_primary": {
+          "type": "text",
+          "value": ""
+        },
+        "short_action_params": {}
+      }
+    },
+    "usemode": "visible",
+    "default_color": "#3a3d40",
+    "layout": "3x4"
+  },
+  "leftkeys": {
+    "keys": {
+      "tl1": {
+        "color": "#3a3d40",
+        "hw_key": "",
+        "short_action": "none",
+        "label_primary": {
+          "type": "text",
+          "value": "TL1"
+        },
+        "short_action_params": {}
+      },
+      "tl2": {
+        "color": "#3a3d40",
+        "hw_key": "",
+        "short_action": "none",
+        "label_primary": {
+          "type": "text",
+          "value": "TL2"
+        },
+        "short_action_params": {}
+      },
+      "tl3": {
+        "color": "#3a3d40",
+        "hw_key": "",
+        "short_action": "none",
+        "label_primary": {
+          "type": "text",
+          "value": "TL3"
+        },
+        "short_action_params": {}
+      },
+      "tl4": {
+        "color": "#3a3d40",
+        "hw_key": "",
+        "short_action": "none",
+        "label_primary": {
+          "type": "text",
+          "value": "TL4"
+        },
+        "short_action_params": {}
+      },
+      "tl5": {
+        "color": "#3a3d40",
+        "hw_key": "",
+        "short_action": "none",
+        "label_primary": {
+          "type": "text",
+          "value": "TL5"
+        },
+        "short_action_params": {}
+      },
+      "tl6": {
+        "color": "#3a3d40",
+        "hw_key": "",
+        "short_action": "none",
+        "label_primary": {
+          "type": "text",
+          "value": "TL6"
+        },
+        "short_action_params": {}
+      }
+    },
+    "usemode": "visible",
+    "default_color": "#3a3d40"
+  },
+  "rightkeys": {
+    "keys": {
+      "tr1": {
+        "color": "#3a3d40",
+        "hw_key": "",
+        "short_action": "none",
+        "label_primary": {
+          "type": "text",
+          "value": "TR1"
+        },
+        "short_action_params": {}
+      },
+      "tr2": {
+        "color": "#3a3d40",
+        "hw_key": "",
+        "short_action": "none",
+        "label_primary": {
+          "type": "text",
+          "value": "TR2"
+        },
+        "short_action_params": {}
+      },
+      "tr3": {
+        "color": "#3a3d40",
+        "hw_key": "",
+        "short_action": "none",
+        "label_primary": {
+          "type": "text",
+          "value": "TR3"
+        },
+        "short_action_params": {}
+      },
+      "tr4": {
+        "color": "#3a3d40",
+        "hw_key": "",
+        "short_action": "none",
+        "label_primary": {
+          "type": "text",
+          "value": "TR4"
+        },
+        "short_action_params": {}
+      },
+      "tr5": {
+        "color": "#3a3d40",
+        "hw_key": "",
+        "short_action": "none",
+        "label_primary": {
+          "type": "text",
+          "value": "TR5"
+        },
+        "short_action_params": {}
+      },
+      "tr6": {
+        "color": "#3a3d40",
+        "hw_key": "",
+        "short_action": "none",
+        "label_primary": {
+          "type": "text",
+          "value": "TR6"
+        },
+        "short_action_params": {}
+      }
+    },
+    "usemode": "visible",
+    "default_color": "#3a3d40"
+  },
+  "secondary": "",
+  "softradio": {
+    "keys": {
+      "sr1": {
+        "color": "#3a3d40",
+        "hw_key": "",
+        "short_action": "none",
+        "label_primary": {
+          "type": "text",
+          "value": "SR1"
+        },
+        "short_action_params": {}
+      },
+      "sr2": {
+        "color": "#3a3d40",
+        "hw_key": "",
+        "short_action": "none",
+        "label_primary": {
+          "type": "text",
+          "value": "SR2"
+        },
+        "short_action_params": {}
+      },
+      "sr3": {
+        "color": "#3a3d40",
+        "hw_key": "",
+        "short_action": "none",
+        "label_primary": {
+          "type": "text",
+          "value": "SR3"
+        },
+        "short_action_params": {}
+      }
+    },
+    "usemode": "hidden",
+    "default_color": "#3a3d40",
+    "layout": "1x3"
+  },
+  "schema_version": 2
+}

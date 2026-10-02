@@ -1,0 +1,189 @@
+name: meldkamer
+
+x-app-image: &app-image
+  image: meldkamer-app:local
+  build: .
+services:
+  db:
+    image: postgis/postgis:16-3.5-alpine
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes: [postgres_data:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+    networks: [backend]
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes", "--maxmemory-policy", "noeviction"]
+    volumes: [redis_data:/data]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    networks: [backend]
+
+
+  livekit:
+    image: livekit/livekit-server:latest
+    restart: unless-stopped
+    environment:
+      LIVEKIT_CONFIG: |
+        port: 7880
+        log_level: info
+        rtc:
+          tcp_port: 7881
+          udp_port: 7882
+          use_external_ip: true
+        redis:
+          address: redis:6379
+        keys:
+          ${LIVEKIT_API_KEY:?LIVEKIT_API_KEY is required}: ${LIVEKIT_API_SECRET:?LIVEKIT_API_SECRET is required}
+    ports:
+      - "127.0.0.1:${LIVEKIT_SIGNAL_PORT:-7880}:7880/tcp"
+      - "${LIVEKIT_TCP_PORT:-7881}:7881/tcp"
+      - "${LIVEKIT_UDP_PORT:-7882}:7882/udp"
+    depends_on:
+      redis: {condition: service_healthy}
+    networks: [backend]
+
+  init-volumes:
+    image: alpine:3.20
+    restart: "no"
+    user: "0:0"
+    command:
+      - /bin/sh
+      - -c
+      - |
+        mkdir -p /app/media/poc /app/staticfiles
+        chown -R 10001:10001 /app/media /app/staticfiles
+        chmod -R 775 /app/media /app/staticfiles
+    volumes:
+      - media_data:/app/media
+      - static_data:/app/staticfiles
+    networks: [backend]
+
+  migrate:
+    <<: *app-image
+    env_file: .env
+    environment:
+      DB_HOST: db
+      REDIS_HOST: redis
+      REDIS_URL: redis://redis:6379/0
+      LIVEKIT_API_KEY: ${LIVEKIT_API_KEY:?LIVEKIT_API_KEY is required}
+      LIVEKIT_API_SECRET: ${LIVEKIT_API_SECRET:?LIVEKIT_API_SECRET is required}
+      LIVEKIT_PUBLIC_URL: ${LIVEKIT_PUBLIC_URL:-}
+      DJANGO_INITIAL_ADMIN_USERNAME: ${DJANGO_INITIAL_ADMIN_USERNAME:-admin}
+      DJANGO_INITIAL_ADMIN_PASSWORD: ${DJANGO_INITIAL_ADMIN_PASSWORD:-poc2026}
+      DJANGO_INITIAL_ADMIN_EMAIL: ${DJANGO_INITIAL_ADMIN_EMAIL:-admin@localhost}
+    command: ["/app/docker/migrate.sh"]
+    restart: "no"
+    volumes: [static_data:/app/staticfiles, media_data:/app/media]
+    depends_on:
+      init-volumes: {condition: service_completed_successfully}
+      db: {condition: service_healthy}
+      redis: {condition: service_healthy}
+    networks: [backend]
+
+  web:
+    <<: *app-image
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DB_HOST: db
+      REDIS_HOST: redis
+      REDIS_URL: redis://redis:6379/0
+      LIVEKIT_API_KEY: ${LIVEKIT_API_KEY:?LIVEKIT_API_KEY is required}
+      LIVEKIT_API_SECRET: ${LIVEKIT_API_SECRET:?LIVEKIT_API_SECRET is required}
+      LIVEKIT_PUBLIC_URL: ${LIVEKIT_PUBLIC_URL:-}
+    volumes: [media_data:/app/media, static_data:/app/staticfiles]
+    ports: ["127.0.0.1:${APP_PORT:-8003}:8000"]
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8000/health/"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    networks: [backend]
+    security_opt: [no-new-privileges:true]
+
+  sweeper:
+    <<: *app-image
+    restart: unless-stopped
+    env_file: .env
+    environment: {DB_HOST: db, REDIS_HOST: redis, REDIS_URL: redis://redis:6379/0}
+    command: ["/app/docker/sweep-loop.sh"]
+    volumes: [media_data:/app/media]
+    depends_on:
+      web: {condition: service_healthy}
+    networks: [backend]
+    security_opt: [no-new-privileges:true]
+
+
+  test-clock:
+    <<: *app-image
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DB_HOST: db
+      REDIS_HOST: redis
+      REDIS_URL: redis://redis:6379/0
+      LIVEKIT_API_KEY: ${LIVEKIT_API_KEY:?LIVEKIT_API_KEY is required}
+      LIVEKIT_API_SECRET: ${LIVEKIT_API_SECRET:?LIVEKIT_API_SECRET is required}
+      TEST_CLOCK_TENANT_SLUG: ${TEST_CLOCK_TENANT_SLUG:-}
+      TEST_CLOCK_TIMEZONE: ${TEST_CLOCK_TIMEZONE:-Europe/Amsterdam}
+      TEST_CLOCK_LIVEKIT_URL: ${TEST_CLOCK_LIVEKIT_URL:-ws://livekit:7880}
+      TEST_CLOCK_PIPER_MODEL: ${TEST_CLOCK_PIPER_MODEL:-/opt/piper-voices/nl_NL-alex-medium.onnx}
+      TEST_CLOCK_PIPER_VOLUME: ${TEST_CLOCK_PIPER_VOLUME:-0.88}
+      TEST_CLOCK_PIPER_NOISE_SCALE: ${TEST_CLOCK_PIPER_NOISE_SCALE:-0.55}
+      TEST_CLOCK_PIPER_NOISE_W_SCALE: ${TEST_CLOCK_PIPER_NOISE_W_SCALE:-0.65}
+      TEST_CLOCK_SPEECH_WPM: ${TEST_CLOCK_SPEECH_WPM:-155}
+      TEST_CLOCK_BEEP_HZ: ${TEST_CLOCK_BEEP_HZ:-1000}
+      TEST_CLOCK_BEEP_LEVEL: ${TEST_CLOCK_BEEP_LEVEL:-0.32}
+    command: ["python", "manage.py", "run_test_clock"]
+    volumes: [media_data:/app/media, static_data:/app/staticfiles]
+    depends_on:
+      web: {condition: service_healthy}
+      livekit: {condition: service_started}
+    networks: [backend]
+    security_opt: [no-new-privileges:true]
+
+
+  backup:
+    image: postgres:16-alpine
+    profiles: [tools]
+    env_file: .env
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      BACKUP_RETENTION_DAYS: ${BACKUP_RETENTION_DAYS:-14}
+    entrypoint: ["/bin/sh", "/scripts/backup.sh"]
+    volumes:
+      - ./docker/backup.sh:/scripts/backup.sh:ro
+      - media_data:/media:ro
+      - backups:/backups
+    depends_on:
+      db: {condition: service_healthy}
+    networks: [backend]
+
+networks:
+  backend:
+    driver: bridge
+volumes:
+  postgres_data:
+  redis_data:
+  media_data:
+  static_data:
+  backups:
