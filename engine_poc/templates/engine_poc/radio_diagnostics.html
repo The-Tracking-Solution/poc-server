@@ -1,0 +1,150 @@
+{% extends "admin/base_site.html" %}
+{% block title %}Radio diagnostics{% endblock %}
+{% block extrastyle %}
+{{ block.super }}
+<style>
+.diag-toolbar {display:flex;gap:12px;align-items:center;margin:0 0 16px;flex-wrap:wrap}
+.diag-grid {display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:14px}
+.diag-card {border:1px solid var(--border-color,#ccc);border-radius:6px;padding:14px;background:var(--body-bg,#fff)}
+.diag-head {display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:10px}
+.diag-head h2 {margin:0;font-size:18px}
+.diag-status {font-weight:700}
+.diag-table {width:100%;border-collapse:collapse}
+.diag-table th,.diag-table td {padding:4px 6px;border-bottom:1px solid var(--hairline-color,#eee);text-align:left;vertical-align:top}
+.diag-table th {width:48%;font-weight:600}
+.diag-section td {padding-top:10px;font-weight:700;text-transform:uppercase;font-size:11px;letter-spacing:.06em}
+.diag-ok {color:#2e7d32}.diag-warn {color:#b26a00}.diag-bad {color:#ba2121}
+.diag-small {font-size:12px;opacity:.75}
+.diag-engine {display:inline-block;padding:2px 7px;border-radius:999px;font-size:11px;font-weight:700;background:#e8eef7;color:#26496b}
+.diag-engine.native {background:#dff3e4;color:#17612c}
+.diag-note {margin:8px 0 0;padding:8px 10px;border-radius:5px;background:var(--darkened-bg,#f4f4f4);font-size:12px}
+</style>
+{% endblock %}
+{% block content %}
+<h1>Radio audio diagnostics</h1>
+<div class="diag-toolbar">
+  <strong>Automatisch verversen: 2 seconden</strong>
+  <span id="diag-updated" class="diag-small">laden…</span>
+  <button type="button" class="button" id="diag-refresh">Nu verversen</button>
+</div>
+<div id="diag-grid" class="diag-grid"></div>
+<script>
+(() => {
+  const endpoint = "{% url 'radio-diagnostics-data' %}";
+  const grid = document.getElementById("diag-grid");
+  const updated = document.getElementById("diag-updated");
+  const esc = value => String(value ?? "—").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  const pick = (obj, path, fallback=null) => {
+    let cur=obj;
+    for (const key of path.split(".")) {
+      if (!cur || typeof cur !== "object" || !(key in cur)) return fallback;
+      cur=cur[key];
+    }
+    return cur;
+  };
+  const scalar = value => {
+    if (value && typeof value === "object") return value.last ?? value.avg ?? "—";
+    return value ?? "—";
+  };
+  const fmt = (value, suffix="") => {
+    value=scalar(value);
+    if (value === null || value === undefined || value === "—") return "—";
+    if (typeof value === "number") value = Math.round(value * 10) / 10;
+    return esc(value) + suffix;
+  };
+  const ageClass = age => age < 12000 ? "diag-ok" : age < 30000 ? "diag-warn" : "diag-bad";
+
+  function card(s) {
+    const t=s.telemetry || {};
+    const w=t.webrtc || {};
+    const a=t.android_audio || {};
+    const native=w.native_audio === true || String(w.provider || "").includes("android");
+    const age=Math.max(0,(s.server_now_ms || Date.now())-(s.last_heartbeat_at_ms || 0));
+    const provider=String(w.provider || (native ? "livekit-android" : "livekit-js"));
+    const nativeEventAge = w.native_last_event_at_ms
+      ? Math.max(0, (s.server_now_ms || Date.now()) - Number(w.native_last_event_at_ms))
+      : null;
+
+    const nativeNote = native
+      ? `<div class="diag-note">
+           Deze radio gebruikt <strong>native Android audio</strong>.
+           Netwerk/decode-statistieken verschijnen zodra de APK ze via de native bridge rapporteert.
+         </div>`
+      : "";
+
+    return `<section class="diag-card">
+      <div class="diag-head">
+        <div>
+          <h2>${esc(s.radio)}</h2>
+          <div class="diag-small">${esc(s.tenant)} · ${esc(s.device_identifier)}</div>
+          <div style="margin-top:5px"><span class="diag-engine ${native ? "native" : ""}">${esc(provider)}</span></div>
+        </div>
+        <div class="diag-status ${ageClass(age)}">${age < 12000 ? "ONLINE" : age < 30000 ? "VERTRAAGD" : "STALE"}<div class="diag-small">${Math.round(age/1000)} s</div></div>
+      </div>
+
+      ${nativeNote}
+
+      <table class="diag-table">
+        <tr class="diag-section"><td colspan="2">Radio</td></tr>
+        <tr><th>Kanaal</th><td>${esc(s.channel)}${s.channel_type ? " ("+esc(s.channel_type)+")":""}</td></tr>
+        <tr><th>Heartbeat RTT</th><td>${fmt(s.roundtrip_ms," ms")}</td></tr>
+
+        <tr class="diag-section"><td colspan="2">Media engine</td></tr>
+        <tr><th>Provider</th><td>${esc(provider)}</td></tr>
+        <tr><th>Native Android audio</th><td>${native ? "JA" : "NEE"}</td></tr>
+        <tr><th>Connection</th><td>${esc(w.connection_state ?? "—")}</td></tr>
+        <tr><th>TX actief</th><td>${w.transmitting === true ? "JA" : w.transmitting === false ? "NEE" : "—"}</td></tr>
+        <tr><th>RX enabled</th><td>${w.receive_enabled === true ? "JA" : w.receive_enabled === false ? "NEE" : "—"}</td></tr>
+        <tr><th>Actieve RX-zender</th><td>${esc(w.active_remote_participant ?? "—")}</td></tr>
+        <tr><th>Remote tracks</th><td>${fmt(w.remote_audio_tracks)}</td></tr>
+        <tr><th>Audio elements</th><td>${fmt(w.audio_elements)}</td></tr>
+        <tr><th>Laatste native event</th><td>${nativeEventAge === null ? "—" : fmt(nativeEventAge/1000," s geleden")}</td></tr>
+        <tr><th>Native event reden</th><td>${esc(w.native_last_reason ?? "—")}</td></tr>
+
+        <tr class="diag-section"><td colspan="2">Android audio</td></tr>
+        <tr><th>Android</th><td>${esc(a.android_release ?? "—")} / SDK ${esc(a.android_sdk ?? "—")}</td></tr>
+        <tr><th>Device</th><td>${esc(a.manufacturer ?? "—")} ${esc(a.model ?? "—")}</td></tr>
+        <tr><th>Output sample rate</th><td>${fmt(a.output_sample_rate," Hz")}</td></tr>
+        <tr><th>Frames / buffer</th><td>${fmt(a.frames_per_buffer)}</td></tr>
+        <tr><th>Audio mode</th><td>${fmt(a.audio_mode)}</td></tr>
+        <tr><th>Speakerphone</th><td>${esc(a.speakerphone_on ?? "—")}</td></tr>
+
+        <tr class="diag-section"><td colspan="2">WebRTC / native receive</td></tr>
+        <tr><th>RX bitrate</th><td>${fmt(w.rx_bitrate_kbps," kbps")}</td></tr>
+        <tr><th>Packet loss</th><td>${fmt(w.rx_loss_percent," %")}</td></tr>
+        <tr><th>Jitter</th><td>${fmt(w.jitter_ms," ms")}</td></tr>
+        <tr><th>RTT</th><td>${fmt(w.rtt_ms," ms")}</td></tr>
+        <tr><th>TX bitrate</th><td>${fmt(w.tx_bitrate_kbps," kbps")}</td></tr>
+
+        <tr class="diag-section"><td colspan="2">Decode / playback</td></tr>
+        <tr><th>Concealed samples</th><td>${fmt(w.concealed_samples)}</td></tr>
+        <tr><th>Concealed Δ / heartbeat</th><td>${fmt(w.concealed_samples_delta)}</td></tr>
+        <tr><th>Concealment events</th><td>${fmt(w.concealment_events)}</td></tr>
+        <tr><th>Concealment events Δ</th><td>${fmt(w.concealment_events_delta)}</td></tr>
+        <tr><th>Total samples received</th><td>${fmt(w.total_samples_received)}</td></tr>
+        <tr><th>Samples received Δ</th><td>${fmt(w.total_samples_received_delta)}</td></tr>
+        <tr><th>Inserted samples</th><td>${fmt(w.inserted_samples_for_deceleration)}</td></tr>
+        <tr><th>Inserted Δ / heartbeat</th><td>${fmt(w.inserted_samples_delta)}</td></tr>
+        <tr><th>Removed samples</th><td>${fmt(w.removed_samples_for_acceleration)}</td></tr>
+        <tr><th>Removed Δ / heartbeat</th><td>${fmt(w.removed_samples_delta)}</td></tr>
+      </table>
+    </section>`;
+  }
+
+  async function refresh() {
+    try {
+      const response=await fetch(endpoint,{credentials:"same-origin",cache:"no-store"});
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const data=await response.json();
+      grid.innerHTML=(data.sessions || []).map(card).join("") || "<p>Geen radiosessies gevonden.</p>";
+      updated.textContent="laatst bijgewerkt: "+new Date().toLocaleTimeString();
+    } catch (error) {
+      updated.textContent="fout: "+error.message;
+    }
+  }
+  document.getElementById("diag-refresh").addEventListener("click",refresh);
+  refresh();
+  setInterval(refresh,2000);
+})();
+</script>
+{% endblock %}

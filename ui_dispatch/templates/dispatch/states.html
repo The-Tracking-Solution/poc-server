@@ -1,0 +1,13 @@
+{% extends "dispatch/base.html" %}
+{% load static %}
+
+{% block title %}Status – {{ tenant.name }}{% endblock %}
+{% block body_class %}dispatch-states-page{% endblock %}
+
+{% block content %}
+{% include "dispatch/_states_content.html" with states_inline=False %}
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'dispatch/js/states.js' %}?v=20260915-states-colors-v5" defer></script>
+{% endblock %}

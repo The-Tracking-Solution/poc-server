@@ -1,0 +1,161 @@
+:root {
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    color: #fff;
+    background: #090909;
+    touch-action: manipulation;
+}
+
+* { box-sizing: border-box; }
+html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; background: #090909; }
+button { font: inherit; }
+[hidden] { display: none !important; }
+
+.radio {
+    width: min(100%, 680px);
+    height: 100vh;
+    height: 100dvh;
+    margin: 0 auto;
+    padding: 0 clamp(6px, 1.8vw, 12px) max(clamp(6px, 1.8vw, 12px), env(safe-area-inset-bottom));
+    display: grid;
+    grid-template-rows: clamp(46px, 8.5dvh, 68px) minmax(0, 34fr) clamp(38px, 7dvh, 58px) minmax(0, 50fr);
+    gap: clamp(4px, 1dvh, 9px);
+    overflow: hidden;
+}
+
+.topbar {
+    min-height: 0;
+    background: #df861f;
+    margin-inline: calc(-1 * clamp(6px, 1.8vw, 12px));
+    display: flex;
+    align-items: center;
+    padding: 0 clamp(12px, 3vw, 18px);
+}
+.topbar h1 { min-width: 0; margin: auto; font-size: clamp(18px, 4.5vmin, 34px); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.menu { flex: 0 0 auto; border: 0; background: none; color: #fff; font-size: clamp(24px, 5vmin, 30px); }
+
+.display, .status, .ptt, .key { border-radius: clamp(9px, 2vmin, 16px); border: 1px solid #303030; }
+
+.display {
+    position: relative;
+    min-height: 0;
+    overflow: hidden;
+    background: #aeb4bf;
+    color: #111827;
+    display: block;
+    padding: 0;
+    transition: background-color .18s ease, color .18s ease;
+}
+.display.receiving { background: #257a35; color: #fff; border-color: #69e979; }
+.display.transmitting { background: #f57c00; color: #151515; border-color: #ffb04a; }
+.display.urgent { background: #165dcc; color: #fff; border-color: #67a5ff; }
+.display.emergency { background: #c62828; color: #fff; border-color: #ff6666; }
+.display.emergency-self { background: #c62828; color: #fff; border-color: #ff6666; }
+
+.display-title {
+    position: absolute;
+    z-index: 3;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: clamp(8px, 1.5dvh, 14px) clamp(10px, 2vw, 18px);
+    border-bottom: 1px solid currentColor;
+    font-size: clamp(14px, 3.4vmin, 25px);
+    line-height: 1;
+    font-weight: 800;
+    letter-spacing: .045em;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.display-content {
+    position: absolute;
+    inset: 0;
+    min-width: 0;
+    min-height: 0;
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-rows:
+        minmax(0, 1fr)
+        auto
+        clamp(30px, 6vmin, 54px)
+        minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr);
+    align-items: center;
+    justify-items: center;
+    padding: clamp(10px, 2dvh, 20px) clamp(10px, 2.5vw, 18px);
+}
+
+/* Het icoon is een overlay en verschuift de twee vaste tekstregels niet. */
+.display-alert-icon {
+    position: absolute;
+    z-index: 2;
+    top: clamp(48px, 15%, 90px);
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: clamp(38px, 9vmin, 78px);
+    line-height: .9;
+}
+
+.primary {
+    grid-row: 2;
+    align-self: end;
+    max-width: 100%;
+    font-size: clamp(30px, 8vmin, 72px);
+    line-height: 1;
+    font-weight: 800;
+    text-align: center;
+    overflow-wrap: anywhere;
+}
+.secondary {
+    grid-row: 3;
+    align-self: start;
+    max-width: 100%;
+    margin-top: clamp(4px, 1.2dvh, 10px);
+    font-size: clamp(17px, 4.5vmin, 38px);
+    line-height: 1.1;
+    font-weight: 650;
+    text-align: center;
+    overflow-wrap: anywhere;
+    white-space: pre-line;
+}
+.display.emergency-self .primary { font-size: clamp(34px, 9vmin, 82px); }
+.display.emergency-self .secondary { font-size: clamp(15px, 3.7vmin, 30px); font-weight: 500; }
+
+.status {
+    min-height: 0;
+    overflow: hidden;
+    background: #1c1c1c;
+    display: flex;
+    align-items: center;
+    padding: 0 clamp(12px, 3vw, 20px);
+    color: #bbb;
+    font-size: clamp(12px, 2.7vmin, 18px);
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.controls { min-height: 0; display: grid; grid-template-rows: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(4px, 1dvh, 9px); }
+.ptt { width: 100%; min-width: 0; min-height: 0; background: #333; color: #fff; font-size: clamp(40px, 11vmin, 96px); line-height: 1; font-weight: 600; }
+.ptt.active { background: #df861f; }
+.keygrid { min-height: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(0, 1fr)); gap: clamp(4px, 1.1vmin, 8px); }
+.key { min-width: 0; min-height: 0; padding: clamp(3px, 1vmin, 8px); background: #333; color: #fff; font-size: clamp(15px, 4vmin, 32px); line-height: 1.05; display: flex; flex-direction: column; align-items: center; justify-content: center; overflow: hidden; }
+.urgent { background: #1261b9; }
+.emergency { background: #d41515; }
+.icon { font-size: clamp(19px, 4.8vmin, 38px); line-height: 1; }
+.ptt:disabled, .key:disabled { opacity: .38; cursor: not-allowed; }
+.ptt, .urgent, .emergency { -webkit-user-select: none; user-select: none; touch-action: none; -webkit-touch-callout: none; }
+
+.countdown { position: absolute; left: clamp(12px, 3vw, 22px); right: clamp(12px, 3vw, 22px); bottom: clamp(10px, 2dvh, 18px); pointer-events: none; }
+.track { width: 100%; height: clamp(7px, 1.5dvh, 13px); border: 1px solid #ffffff88; border-radius: 999px; overflow: hidden; background: #0006; }
+.bar { width: 100%; height: 100%; background: #fff; transform: scaleX(1); transform-origin: left center; transition: none; }
+
+@media (max-height: 560px) {
+    .radio { grid-template-rows: clamp(38px, 8dvh, 48px) minmax(0, 30fr) clamp(32px, 6.5dvh, 42px) minmax(0, 55fr); gap: 4px; padding-bottom: max(4px, env(safe-area-inset-bottom)); }
+    .display-title { padding-block: 6px; font-size: clamp(12px, 3vmin, 18px); }
+    .display-content { padding-block: 6px; }
+    .controls, .keygrid { gap: 4px; }
+    .countdown { bottom: 6px; }
+}

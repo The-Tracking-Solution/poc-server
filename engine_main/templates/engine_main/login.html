@@ -1,0 +1,33 @@
+{% load static %}
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#071a35">
+  <title>Inloggen</title>
+  <link rel="stylesheet" href="{% static 'engine_main/login.css' %}?v=20260916-login-layout-v4">
+</head>
+<body>
+  <main class="login-shell">
+    <section class="login-card" aria-labelledby="login-title">
+      <header class="login-heading">
+        <h1 id="login-title">Inloggen</h1>
+        <div class="login-device-id" aria-label="Device ID">DevId&nbsp; {{ hardware_short_code|default:"—" }}</div>
+      </header>
+      <form method="post" id="porto-login-form" novalidate data-device-login="{% if hardware_short_code %}1{% else %}0{% endif %}">
+        {% csrf_token %}<input type="hidden" name="next" value="{{ next }}">
+        {% if device_login_error %}<div class="form-error" role="alert">{{ device_login_error }}</div>{% endif %}
+        {% if form.non_field_errors %}<div class="form-error" role="alert">Gebruikersnaam of wachtwoord is niet correct.</div>{% endif %}
+        <label for="id_username">Gebruikersnaam</label>
+        <input id="id_username" name="username" type="text" autocomplete="username" autocapitalize="none" value="{{ form.username.value|default:'' }}">
+        <label for="id_password">Wachtwoord</label>
+        <div class="password-field"><input id="id_password" name="password" type="password" autocomplete="current-password"><button id="toggle-password" type="button" aria-label="Wachtwoord tonen">Toon</button></div>
+        <button class="login-button" type="submit">{% if hardware_short_code and login_mode == 'device' %}Login DevId{% else %}Login Gebruiker{% endif %}</button>
+      </form>
+      <p class="login-status" id="login-status" role="status" aria-live="polite"></p>
+    </section>
+  </main>
+  <script src="{% static 'engine_main/login.js' %}?v=20260916-login-layout-v4" defer></script>
+</body>
+</html>

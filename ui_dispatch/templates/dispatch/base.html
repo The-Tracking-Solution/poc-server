@@ -1,0 +1,79 @@
+{% load static %}
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>{% block title %}The Tracking Solution Dispatch{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,500,0,0">
+  <link rel="stylesheet" href="{% static 'dispatch/css/dispatch.css' %}?v=20260916-topbar-v3">
+  {% block extra_head %}{% endblock %}
+</head>
+<body class="{% block body_class %}{% endblock %}" data-tenant-slug="{{ tenant.slug }}" data-dispatch-user="{{ dispatch_user.external_name|default:''|escape }}">
+  <header class="topbar">
+    <div class="topbar-left">
+      <img class="brand-logo" src="{% static 'engine_main/ic_launcher_round.png' %}" alt="Applicatie">
+      <div class="topbar-identity" title="{{ tenant.name }} - {{ dispatch_user.external_name|default:request.user.username }}">
+        <span class="topbar-tenant">{{ tenant.name }}</span>
+        <span class="topbar-separator" aria-hidden="true">-</span>
+        <span class="topbar-dispatch-name">{{ dispatch_user.external_name|default:request.user.username }}</span>
+      </div>
+    </div>
+
+    <div id="dispatchTopbarAlerts" class="topbar-center" aria-live="polite">
+      <div id="dispatchHeartbeatAlert" class="dispatch-heartbeat-alert" hidden role="alert" aria-live="assertive">
+        <span class="material-symbols-rounded" aria-hidden="true">heart_broken</span>
+        <span>Geen heartbeat<span id="dispatchHeartbeatUser"></span></span>
+      </div>
+    </div>
+
+    <nav class="topbar-right" aria-label="Dispatch navigatie">
+      <a class="topbar-nav-link {% if request.resolver_match.url_name == 'radio' or request.resolver_match.url_name == 'radio-slash' %}is-active{% endif %}"
+         href="{% url 'dispatch:radio' tenant_slug=tenant.slug %}" title="Radio" aria-label="Radio">
+        <span class="material-symbols-rounded" aria-hidden="true">cell_tower</span>
+      </a>
+      <span class="topbar-divider" aria-hidden="true"></span>
+      <a class="topbar-nav-link {% if request.resolver_match.url_name == 'map' or request.resolver_match.url_name == 'map-slash' %}is-active{% endif %}"
+         href="{% url 'dispatch:map' tenant_slug=tenant.slug %}" title="Kaart" aria-label="Kaart">
+        <span class="material-symbols-rounded" aria-hidden="true">map</span>
+      </a>
+      <span class="topbar-divider" aria-hidden="true"></span>
+      <a class="topbar-nav-link {% if request.resolver_match.url_name == 'network' or request.resolver_match.url_name == 'network-slash' %}is-active{% endif %}"
+         href="{% url 'dispatch:network' tenant_slug=tenant.slug %}" title="Netwerk" aria-label="Netwerk">
+        <span class="material-symbols-rounded" aria-hidden="true">account_tree</span>
+      </a>
+      <span class="topbar-divider" aria-hidden="true"></span>
+      <a class="topbar-nav-link {% if request.resolver_match.url_name == 'states' or request.resolver_match.url_name == 'states-slash' %}is-active{% endif %}"
+         href="{% url 'dispatch:states' tenant_slug=tenant.slug %}" title="Statusoverzicht" aria-label="Statusoverzicht">
+        <span class="material-symbols-rounded" aria-hidden="true">empty_dashboard</span>
+      </a>
+      <span class="topbar-divider" aria-hidden="true"></span>
+      <a class="topbar-nav-link {% if request.resolver_match.url_name == 'overview' or request.resolver_match.url_name == 'overview-slash' %}is-active{% endif %}"
+         href="{% url 'dispatch:overview' tenant_slug=tenant.slug %}" title="Overzicht" aria-label="Overzicht">
+        <span class="material-symbols-rounded" aria-hidden="true">overview</span>
+      </a>
+      <span class="topbar-divider" aria-hidden="true"></span>
+      {% if request.user.is_staff %}
+      <a class="topbar-nav-link" href="{% url 'admin:index' %}" title="Admin" aria-label="Admin">
+        <span class="material-symbols-rounded" aria-hidden="true">admin_panel_settings</span>
+      </a>
+      {% else %}
+      <span class="topbar-nav-link is-disabled" title="Admin niet beschikbaar" aria-hidden="true">
+        <span class="material-symbols-rounded">admin_panel_settings</span>
+      </span>
+      {% endif %}
+      <span class="topbar-divider" aria-hidden="true"></span>
+      <a class="topbar-nav-link" href="{% url 'engine_main:tenant-select' tenant.slug %}?choose=1" title="Radio/dispatch keuze" aria-label="Radio/dispatch keuze">
+        <span class="material-symbols-rounded" aria-hidden="true">group</span>
+      </a>
+      <span class="topbar-divider" aria-hidden="true"></span>
+      <div id="clock" class="clock topbar-clock" aria-label="Huidige tijd"></div>
+    </nav>
+  </header>
+  {% block content %}{% endblock %}
+  <script src="{% static 'dispatch/js/header_heartbeat.js' %}?v=20260916-topbar-v3" defer></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

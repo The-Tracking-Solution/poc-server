@@ -1,0 +1,120 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>{{ screen_model.name }} – Radio schermtest</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:FILL@0..1&display=swap">
+    <link rel="stylesheet" href="{% static 'ui_radio/dev_screen.css' %}?v=20260813-emergency-red-tx-orange-v3">
+    <script>
+        if (new URLSearchParams(window.location.search).get("inspection") === "1") {
+            document.documentElement.classList.add("dev-inspection-mode");
+        }
+    </script>
+</head>
+<body>
+<div class="dev-split-layout" id="dev-split-layout">
+    <section class="dev-left-pane" aria-label="Schaalbare radio testviewer">
+<header class="dev-test-toolbar" aria-label="Dev viewer instellingen">
+    <div class="dev-size-controls">
+        <strong class="dev-size-title">Radio testformaat</strong>
+
+        <label class="dev-size-field" for="dev-radio-width">
+            <span>Width</span>
+            <input id="dev-radio-width" type="number" min="120" max="4096" step="1" value="390" inputmode="numeric">
+            <span>px</span>
+        </label>
+
+        <label class="dev-size-field" for="dev-radio-height">
+            <span>Height</span>
+            <input id="dev-radio-height" type="number" min="200" max="4096" step="1" value="844" inputmode="numeric">
+            <span>px</span>
+        </label>
+
+        <button class="button dev-size-apply" id="dev-size-apply" type="button">Toepassen</button>
+        <span class="dev-size-status" id="dev-size-status" aria-live="polite"></span>
+    </div>
+
+</header>
+<div class="dev-viewer-stage" id="dev-viewer-stage">
+  <div class="dev-viewer-scale-box" id="dev-viewer-scale-box">
+<!--
+    Dev hardware-opstelling:
+    - boven: TK1/TK2/TK7/TK3/TK4/TK8/TK5/TK6
+    - links: TL1 t/m TL6
+    - rechts: TR1 t/m TR6
+
+    Alleen in JSON gedefinieerde toetsen worden gerenderd. Daardoor ontstaat
+    geen gereserveerde lege ruimte voor ontbrekende hardwaretoetsen.
+-->
+<div class="dev-hardware-shell" id="dev-hardware-shell">
+    <section class="external-top-keys" id="external-top-keys" aria-label="Boventoetsen"></section>
+    <section class="external-side-keys external-left-keys" id="external-left-keys" aria-label="Linkertoetsen"></section>
+
+    <main class="radio-device" id="radio-device">
+        <div class="radio-column radio-column-left">
+            <section class="display-section" id="display-section" aria-label="Radioscherm">
+                <div class="radio-screen" id="radio-screen">
+                    <header class="radio-name" id="radio-name">Radio 1</header>
+
+                    <div class="screen-content" id="screen-content">
+                        <div class="detail-screen" id="detail-screen">
+                            <div class="channel-name" id="channel-name">Catering 1</div>
+                            <div class="feedback-text" id="feedback-text" aria-live="polite">..</div>
+                        </div>
+
+                        <div class="list-screen" id="list-screen" hidden>
+                            <div class="screen-list" id="screen-list" role="listbox" aria-label="Schermen"></div>
+                        </div>
+                    </div>
+
+                    <div class="softkey-panel" id="softkey-panel" aria-label="Softkeys"></div>
+                </div>
+            </section>
+
+            <section class="navigation-section" id="navigation-section" aria-label="Navigatietoetsen">
+                <div class="navigation-grid" id="navigation-grid"></div>
+            </section>
+
+        </div>
+        <div class="radio-column radio-column-right">
+            <section class="keypad-section" id="keypad-section" aria-label="Toetsenbord">
+                <div id="keypad-host" class="keypad-host"></div>
+            </section>
+
+            <section class="softradio-section" id="softradio-section" aria-label="Softradio">
+                <div id="softradio-host" class="softradio-host"></div>
+            </section>        </div>
+    </main>
+
+    <section class="external-side-keys external-right-keys" id="external-right-keys" aria-label="Rechtertoetsen"></section>
+</div>
+  </div>
+</div>
+    </section>
+
+    <section class="dev-right-pane" aria-label="Volledige radio zonder usemode-filter">
+        <iframe
+            class="dev-full-radio-frame"
+            id="dev-full-radio-frame"
+            title="Volledige radio ongeacht usemode"
+        ></iframe>
+    </section>
+</div>
+
+{{ screen_config|json_script:"button-config" }}
+<script>
+    window.RADIO_HARDWARE_PROFILE = {
+        id: {{ screen_model.pk }},
+        name: "{{ screen_model.name|escapejs }}",
+        tenant: "{{ screen_model.tenant.name|escapejs }}"
+    };
+</script>
+<script src="{% static 'ui_radio/radio_press.js' %}?v=20260812-press-timing-v2" defer></script>
+<script src="{% static 'ui_radio/dev_screen.js' %}?v=20260818-keyboard-screenfix-v3" defer></script>
+</body>
+</html>

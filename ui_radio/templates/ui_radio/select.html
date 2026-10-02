@@ -1,0 +1,3 @@
+{% load static %}
+<!doctype html><html lang="nl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Kies radio</title></head><body><h1>Kies radio</h1>{% for u in radio_users %}<p><a href="{% url 'ui_radio:screen' u.tenant.slug %}">{{ u.external_name }} – {{ u.tenant.name }}</a></p>{% empty %}<p>Geen radio gekoppeld.</p>{% endfor %}  <script src="{% static 'engine_main/dpad_navigation.js' %}?v=20260916-dpad-all-pages-v1"></script>
+</body></html>

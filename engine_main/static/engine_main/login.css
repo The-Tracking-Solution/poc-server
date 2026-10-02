@@ -1,0 +1,82 @@
+:root {
+  color-scheme: dark;
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+* { box-sizing: border-box; }
+html, body { width:100%; height:100%; margin:0; overflow:hidden; }
+body { min-height:100dvh; background:#06172f; color:#fff; }
+.login-shell {
+  width:100%; height:100dvh; min-height:0;
+  display:flex; align-items:stretch; justify-content:center;
+  overflow:hidden;
+  padding:max(5px, env(safe-area-inset-top)) max(6px, env(safe-area-inset-right)) max(5px, env(safe-area-inset-bottom)) max(6px, env(safe-area-inset-left));
+  background:radial-gradient(circle at 50% 0,#113d72 0,#06172f 52%);
+}
+.login-card {
+  width:min(100%,760px); height:100%; min-height:0;
+  padding:clamp(8px,2.0vmin,18px);
+  border:1px solid #31557f; border-radius:clamp(10px,2vmin,18px);
+  background:#0c2341; box-shadow:0 14px 42px #0007;
+  display:grid; grid-template-rows:auto minmax(0,1fr) auto;
+  gap:clamp(4px,1.4vh,10px);
+}
+.login-heading {
+  display:grid; grid-template-columns:minmax(0,1fr) auto;
+  align-items:center; gap:12px;
+  min-height:clamp(30px,8vh,58px);
+  border-bottom:1px solid #31557f;
+  padding:0 clamp(2px,.8vw,8px) clamp(5px,1.2vh,10px);
+}
+.login-card h1, .login-device-id {
+  margin:0; font-size:clamp(18px,5.4vh,34px); line-height:1;
+  font-weight:900; white-space:nowrap;
+}
+.login-device-id { color:#d4e6f8; text-align:right; letter-spacing:.02em; }
+form {
+  min-height:0; display:grid;
+  grid-template-rows:auto minmax(34px,1fr) auto minmax(34px,1fr) minmax(36px,1fr);
+  gap:clamp(3px,1.0vh,8px);
+  align-content:stretch;
+}
+label {
+  align-self:end; margin:0; color:#c5daf1;
+  font-weight:800; font-size:clamp(11px,2.4vh,17px);
+}
+input {
+  width:100%; height:100%; min-height:34px;
+  padding:clamp(5px,1.3vh,10px) clamp(10px,2vw,16px);
+  border:1px solid #50739b; border-radius:9px;
+  background:#06172f; color:#fff; font:inherit;
+  font-size:clamp(14px,3.2vh,20px);
+}
+input:focus { outline:3px solid #3184dc55; border-color:#6ab4ff; }
+.password-field { position:relative; min-height:34px; height:100%; }
+.password-field input { padding-right:76px; }
+.password-field button {
+  position:absolute; right:7px; top:50%; transform:translateY(-50%);
+  min-width:58px; height:calc(100% - 10px); min-height:24px;
+  border:0; border-radius:6px; background:#23486f; color:#fff;
+  font-weight:800; font-size:clamp(10px,2vh,14px);
+}
+.login-button {
+  width:100%; height:100%; min-height:36px; margin:0;
+  border:1px solid #ffab68; border-radius:9px;
+  background:#f57c00; color:#101010; font:inherit;
+  font-size:clamp(14px,3.1vh,20px); font-weight:900; cursor:pointer;
+}
+.login-button:focus, .password-field button:focus { outline:3px solid #ffcf7a; outline-offset:1px; }
+.form-error {
+  grid-column:1/-1; padding:5px 8px; border:1px solid #ff7373;
+  border-radius:8px; background:#681d28; font-size:clamp(11px,2vh,15px);
+}
+.login-status { min-height:0; margin:0; color:#a9caec; text-align:center; font-size:clamp(10px,1.8vh,14px); }
+.login-status:empty { display:none; }
+@media (max-height:300px) {
+  .login-card { padding:5px 8px; gap:3px; }
+  .login-heading { min-height:27px; padding-bottom:3px; }
+  .login-card h1, .login-device-id { font-size:16px; }
+  form { gap:2px; grid-template-rows:auto minmax(29px,1fr) auto minmax(29px,1fr) minmax(30px,1fr); }
+  label { font-size:10px; }
+  input { min-height:29px; font-size:13px; padding-block:3px; }
+  .login-button { min-height:30px; font-size:13px; }
+}

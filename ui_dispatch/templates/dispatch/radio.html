@@ -1,0 +1,206 @@
+{% extends "dispatch/base.html" %}
+{% load static %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+{% endblock %}
+
+{% block content %}
+<main class="dispatch-radio-screen">
+  <div id="connectionLostBanner" class="connection-lost-banner" hidden role="alert"><span class="material-symbols-rounded" aria-hidden="true">wifi_off</span><strong>Connection lost</strong><button id="reconnectButton" type="button">Reconnect</button></div>
+  <section class="dispatch-console" aria-label="Dispatchconsole">
+    <section id="radioPanel" class="radio radio-console dispatch-primary-radio">
+  <div class="radio-left-controls">
+    <div class="power-status">
+      <button id="powerButton" class="round-control" title="Radio aan/uit" aria-label="Radio aan/uit"><span class="material-symbols-rounded" aria-hidden="true">power_settings_new</span></button>
+      <div class="led" aria-label="Radiostatus"></div>
+    </div>
+    <button id="radioSettingsButton" class="round-control settings-front" title="Radio-instellingen" aria-label="Radio-instellingen"><span class="material-symbols-rounded" aria-hidden="true">settings</span></button>
+  </div>
+  <div class="front-stereo-volume" aria-label="Volume links en rechts">
+    <label><span class="material-symbols-rounded" aria-hidden="true">left_panel_open</span><span class="sr-only">Volume links</span><input id="frontLeftVolume" class="vertical-volume" type="range" min="0" max="100" value="100" orient="vertical"></label>
+    <label><span class="material-symbols-rounded" aria-hidden="true">right_panel_open</span><span class="sr-only">Volume rechts</span><input id="frontRightVolume" class="vertical-volume" type="range" min="0" max="100" value="100" orient="vertical"></label>
+    <button id="speakerMuteButton" class="speaker-mute stereo-mute" title="Dempen / dempen opheffen" aria-label="Dempen / dempen opheffen" aria-pressed="false"><span class="material-symbols-rounded" aria-hidden="true">volume_off</span></button>
+  </div>
+  <div class="radio-center">
+    <div id="radioDisplay" class="display idle">
+      <div class="radio-display-table" role="table" aria-label="Luister- en zendkanalen">
+        <div class="radio-display-icon" role="cell"><span class="material-symbols-rounded" aria-hidden="true">ear_sound</span><span class="sr-only">Luisteren</span></div>
+        <div class="radio-display-channels" role="cell">Geen kanalen</div>
+        <div class="radio-display-icon" role="cell"><span class="material-symbols-rounded" aria-hidden="true">mic</span><span class="sr-only">Zenden</span></div>
+        <div class="radio-display-channels" role="cell">Geen kanalen</div>
+      </div>
+    </div>
+    <div class="function-keys radio-softkeys">
+      <button class="function-key radio-config-button" data-function-key="0" data-radio-slot="R1"><span>R1</span></button>
+      <button class="function-key radio-config-button" data-function-key="1" data-radio-slot="R2"><span>R2</span></button>
+      <button class="function-key radio-config-button" data-function-key="2" data-radio-slot="R3"><span>R3</span></button>
+      <button class="function-key radio-config-button" data-function-key="3" data-radio-slot="R4"><span>R4</span></button>
+      <button class="function-key radio-config-button" data-function-key="4" data-radio-slot="R5"><span>R5</span></button>
+    </div>
+  </div>
+  <button id="dispatchPtt" class="ptt" disabled>PTT</button>
+    </section>
+
+    <section class="dispatch-console-lower">
+      <div class="address-book">
+        <input id="search" class="search" placeholder="Zoeken">
+        <nav id="addressBookGroupNav" class="address-book-group-nav" aria-label="Adresboekgroepen"></nav>
+        <div class="audio-legend" aria-label="Betekenis van de audiokleuren">
+          <span><span class="material-symbols-rounded audio-primary" aria-hidden="true">volume_up</span>Primair volume</span>
+          <span><span class="material-symbols-rounded audio-secondary" aria-hidden="true">volume_down</span>Secundair volume</span>
+          <span><span class="material-symbols-rounded audio-unselected" aria-hidden="true">volume_off</span>Gedempt</span>
+        </div>
+        <div class="address-book-scroll">
+<div id="channelGroups">
+<section id="channelsSection" class="channel-group-section" data-address-group="not-assigned"><div class="section-title">Not assigned</div><div class="tile-grid">
+{% for channel in channels %}
+<article class="tile channel-tile" data-id="{{ channel.id }}" data-name="{{ channel.name|escape }}" data-search="{{ channel.name|lower }}">
+<div class="tile-head"><button class="audio always" title="Audiomodus" aria-label="Audiomodus"><span class="material-symbols-rounded" aria-hidden="true">volume_up</span></button><span class="mode">POC</span><button class="settings" title="Instellingen" aria-label="Instellingen"><span class="material-symbols-rounded" aria-hidden="true">settings</span></button></div>
+<div class="tile-body"><div class="primary">{{ channel.name }}</div><div class="secondary"></div><div class="channel-presence"><span class="presence-group" title="Verbonden radio's"><span class="material-symbols-rounded" aria-hidden="true">mobile</span><span data-radio-presence>0</span></span><span class="presence-group dispatcher-presence" title="Luisterende dispatchers"><span class="material-symbols-rounded" aria-hidden="true">support_agent</span><span data-dispatch-presence>0</span></span></div></div>
+</article>
+{% endfor %}
+</div></section>
+</div>
+<section id="unitsSection" class="channel-group-section" data-address-group="radios"><div class="section-title">RADIO'S</div><div class="tile-grid">
+{% for unit in units %}
+<article class="tile unit-tile actor-tile" data-actor-kind="radio" data-id="{{ unit.id }}" data-name="{{ unit.external_name|escape }}" data-channel="{{ unit.current_channel_id|default:'' }}" data-user-status="{{ unit.user_status_id|default:'' }}" data-user-status-label="{{ unit.user_status.selection_label|default:''|escape }}" data-emergency="{% if unit.user_contact_status.call_request_priority == 1 %}true{% else %}false{% endif %}" data-search="{{ unit.external_name|lower }} {{ unit.current_channel.name|lower }}">
+<div class="tile-head"><span class="connection-status-icon connection-offline" data-connection-icon title="Offline" aria-label="Offline"><span class="material-symbols-rounded" aria-hidden="true">mobile</span></span><span class="mode">Radio</span><button class="settings" title="Instellingen" aria-label="Instellingen"><span class="material-symbols-rounded" aria-hidden="true">settings</span></button></div>
+<div class="tile-body"><div class="primary">{{ unit.external_name }}</div><div class="secondary">{{ unit.current_channel.name }}</div></div>
+</article>
+{% endfor %}
+{% for dispatcher in dispatchers %}
+<article class="tile dispatcher-tile actor-tile" data-actor-kind="dispatch" data-id="{{ dispatcher.id }}" data-name="{{ dispatcher.external_name|escape }}" data-search="{{ dispatcher.external_name|lower }} dispatcher">
+<div class="tile-head"><span class="connection-status-icon connection-offline" data-connection-icon title="Offline" aria-label="Offline"><span class="material-symbols-rounded" aria-hidden="true">support_agent</span></span><span class="mode">Dispatch</span><span class="tile-head-spacer" aria-hidden="true"></span></div>
+<div class="tile-body"><div class="primary">{{ dispatcher.external_name }}</div><div class="secondary">Dispatcher</div></div>
+</article>
+{% endfor %}
+</div></section>
+        </div>
+        <div id="addressBookMapView" class="address-book-map-view" hidden>
+          <div class="dispatch-map-search" data-map-search>
+            <div class="dispatch-map-search-box">
+              <span class="material-symbols-rounded dispatch-map-search-icon" aria-hidden="true">search</span>
+              <input type="search" class="dispatch-map-search-input" data-map-search-input placeholder="Zoek radio" autocomplete="off" spellcheck="false" aria-label="Zoek radio op de kaart" aria-autocomplete="list" aria-expanded="false">
+            </div>
+            <div class="dispatch-map-search-results" data-map-search-results role="listbox" hidden></div>
+          </div>
+          <div id="dispatchInlineMap" class="dispatch-map-canvas"></div>
+          <div id="dispatchInlineMapEmpty" class="dispatch-map-empty" hidden>Geen recente locaties beschikbaar</div>
+        </div>
+        <div id="addressBookNetworkView" class="address-book-network-view" hidden>
+          <a class="dispatch-network-fullscreen-link"
+             href="{% url 'dispatch:network' tenant_slug=tenant.slug %}"
+             target="_blank"
+             rel="noopener"
+             title="Netwerk in nieuw scherm openen"
+             aria-label="Netwerk in nieuw scherm openen">
+            <span class="material-symbols-rounded" aria-hidden="true">open_in_new</span>
+          </a>
+          {% include "dispatch/_network_content.html" with network_inline=True %}
+        </div>
+        <div id="addressBookStatesView" class="address-book-states-view" hidden>
+          <a class="dispatch-states-fullscreen-link"
+             href="{% url 'dispatch:states' tenant_slug=tenant.slug %}"
+             target="_blank"
+             rel="noopener"
+             title="Statusoverzicht in nieuw scherm openen"
+             aria-label="Statusoverzicht in nieuw scherm openen">
+            <span class="material-symbols-rounded" aria-hidden="true">open_in_new</span>
+          </a>
+          {% include "dispatch/_states_content.html" with states_inline=True %}
+        </div>
+      </div>
+      <aside id="sidebarButtonRail" class="dispatch-button-rail" aria-label="Sidebar buttons">
+        <div id="sidebarButtons" class="sidebar-buttons" aria-live="polite"></div>
+      </aside>
+    </section>
+  </section>
+
+  <aside class="dispatch-right-column">
+    <section class="contact-requests" aria-labelledby="contactRequestsTitle">
+      <h2 id="contactRequestsTitle">CONTACT REQUESTS</h2>
+      <div id="contactRequestsList" class="contact-requests-list">
+        <p class="empty">Geen contact requests</p>
+      </div>
+    </section>
+    <section class="private-call" aria-labelledby="privateCallsTitle">
+      <h2 id="privateCallsTitle">PRIVATE CALLS</h2>
+      <div class="private-call-screen" aria-label="Gereserveerde ruimte voor Private Calls"></div>
+    </section>
+  </aside>
+</main>
+<dialog id="modal"><div class="modal-head"><h2 id="modalTitle">Instellingen</h2><button id="modalClose" class="close">×</button></div><div class="modal-body">
+<div class="radio-card-balance">
+  <span>Balans</span>
+  <div class="balance-control">
+    <span>L</span><input id="cardBalance" class="balance-slider" type="range" min="-100" max="100" value="0" aria-label="Balans links/rechts"><span>R</span>
+  </div>
+</div>
+<div class="audio-mode-label">Audio mode</div><div class="mode-options"><button data-mode="primary">Primair</button><button data-mode="secondary">Secundair</button><button data-mode="selected-only">Alleen bij geselecteerd</button></div>
+<div class="audio-mode-label">Hotkey kanaalselectie</div>
+<div class="hotkey-row"><span>Toets</span><button id="channelHotkey" class="hotkey-input" type="button">Niet toegewezen</button><button id="clearChannelHotkey" class="small-btn" type="button">Wissen</button></div>
+<div class="help">Klik op het toetsveld en druk daarna op een fysieke toets, bijvoorbeeld Numpad 1 of spatie.</div>
+<section id="radioCardChannelSection" class="radio-card-channel" hidden>
+  <label for="radioCardChannel"><strong>Kanaal van radio</strong></label>
+  <select id="radioCardChannel"></select>
+  <button id="saveRadioCardChannel" class="small-btn" type="button">Kanaal instellen</button>
+</section>
+<p id="radioCardChannelFeedback" class="emergency-cancel-feedback" role="status" aria-live="polite"></p>
+<section id="radioCardStatusSection" class="radio-card-channel" hidden>
+  <label for="radioCardStatus"><strong>Gebruikersstatus</strong></label>
+  <select id="radioCardStatus"></select>
+  <button id="saveRadioCardStatus" class="small-btn" type="button">Status instellen</button>
+</section>
+<p id="radioCardStatusFeedback" class="emergency-cancel-feedback" role="status" aria-live="polite"></p>
+<section id="radioCardEmergencySection" class="radio-card-emergency" hidden>
+  <div><strong>Noodoproep actief</strong><p>Annuleer de noodstatus van deze radio en herstel de vorige gebruikersstatus.</p></div>
+  <button id="cancelRadioEmergency" class="danger-btn" type="button">Noodoproep annuleren</button>
+</section>
+<p id="radioCardEmergencyFeedback" class="emergency-cancel-feedback" role="status" aria-live="polite"></p>
+</div></dialog>
+<dialog id="radioSettingsModal" class="master-dialog"><div class="modal-head"><h2>Radio-instellingen</h2><button id="radioSettingsClose" class="close">×</button></div><div class="modal-body">
+<section class="radio-settings-section"><h3>Volume</h3>
+  <div class="volume-row"><span>Master Links</span><input id="radioVolumeLeft" type="range" min="0" max="100" value="100"><output id="radioVolumeLeftValue">100</output></div>
+  <div class="volume-row"><span>Master Rechts</span><input id="radioVolumeRight" type="range" min="0" max="100" value="100"><output id="radioVolumeRightValue">100</output></div>
+  <div class="hotkey-row"><span>Hotkey (un)mute</span><button id="muteHotkey" class="hotkey-input" type="button">Niet toegewezen</button><button id="clearMuteHotkey" class="small-btn" type="button">Wissen</button></div>
+  <label class="toggle-setting"><input id="txAcceptTone" type="checkbox"> TX-accepttoon afspelen</label>
+  <label class="toggle-setting"><input id="keyTone" type="checkbox"> Toetstonen afspelen</label>
+  <div class="volume-mode-settings">
+    <div class="volume-row"><span>Volume Secundair</span><input id="secondaryVolume" type="range" min="0" max="100" value="50"><output id="secondaryVolumeValue">50</output></div>
+    <p class="settings-caption">Secundair volume wordt gebruikt indien er een TX-kanaal is geselecteerd, voor alle andere kanalen die op dat moment beluisterd worden.</p>
+  </div>
+</section>
+<section class="radio-settings-section"><h3>Spraakaanvragen</h3>
+  <label class="toggle-setting"><input id="callRequestAudioEnabled" type="checkbox"> Geluid bij spraakaanvragen</label>
+  <div class="volume-row"><span>Meldingsvolume</span><input id="callRequestAudioVolume" type="range" min="0" max="100" value="80"><output id="callRequestAudioVolumeValue">80</output></div>
+  <p class="settings-caption">Prioriteit 1: huidige lage starttoon; na 15 seconden afwisselend laag/hoog Morse SOS tot de noodoproep is geclaimd. Tijdens RX of TX op het noodkanaal is het SOS-signaal stil en daarna hervat het automatisch.</p>
+  <table class="settings-table"><thead><tr><th>Prioriteit</th><th>Ping(s)</th></tr></thead><tbody>
+    <tr><td>2</td><td><input id="priority2Pings" type="number" min="0" max="12" value="5"></td></tr>
+    <tr><td>3</td><td><input id="priority3Pings" type="number" min="0" max="12" value="4"></td></tr>
+    <tr><td>4</td><td><input id="priority4Pings" type="number" min="0" max="12" value="3"></td></tr>
+    <tr><td>5</td><td><input id="priority5Pings" type="number" min="0" max="12" value="2"></td></tr>
+    <tr><td>6</td><td><input id="priority6Pings" type="number" min="0" max="12" value="1"></td></tr>
+  </tbody></table>
+</section>
+<section class="radio-settings-section channel-settings"><h3>Channellist</h3>
+  <table class="settings-table"><thead><tr><th>Name</th><th>Group</th><th>Audio mode</th><th>Balance</th><th>Hotkey</th></tr></thead><tbody id="assignedChannelsBody"></tbody></table>
+</section>
+<section class="radio-settings-section"><h3>Diagnose</h3><p class="settings-caption">Download verbindings-, kanaal- en PTT-fouten voor probleemonderzoek.</p><button id="downloadDispatchErrorLog" class="small-btn" type="button">Foutlog downloaden</button><button id="clearDispatchErrorLog" class="small-btn" type="button">Foutlog wissen</button></section>
+</div></dialog><div id="audioRoot"></div>
+{{ dispatch_poc_channels|json_script:"dispatch-poc-channels" }}
+{{ dispatch_units|json_script:"dispatch-units" }}
+{{ dispatch_radio_settings|json_script:"dispatch-radio-settings" }}
+{{ dispatch_statuses|json_script:"dispatch-user-statuses" }}
+{{ dispatch_buttons|json_script:"dispatch-buttons" }}
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/livekit-client@2.22.0/dist/livekit-client.umd.min.js" defer></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<script src="{% static 'dispatch/js/map.js' %}?v=20260917-master-audio-v1" defer></script>
+<script src="{% static 'ui_radio/livekit_media.js' %}?v=20260923-old-route-v1" defer></script>
+<script src="{% static 'dispatch/js/dispatch.js' %}?v=20260917-master-audio-v1" defer></script>
+<script src="{% static 'dispatch/js/network.js' %}?v=20260915-card-colors-v1" defer></script>
+<script src="{% static 'dispatch/js/states.js' %}?v=20260915-states-colors-v5" defer></script>
+{% endblock %}

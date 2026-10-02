@@ -1,0 +1,172 @@
+{
+  "topkeys": {
+    "usemode": "hidden",
+    "default_color": "#3a3d40",
+    "keys": {
+      "tk1": {
+        "label_primary": {
+          "type": "text",
+          "value": "TK1"
+        },
+        "action": "none",
+        "hw_key": "F5"
+      },
+      "tk2": {
+        "label_primary": {
+          "type": "text",
+          "value": "TK2"
+        },
+        "action": "none",
+        "hw_key": "F6"
+      },
+      "tk7": {
+        "type": "rotary",
+        "label_primary": {
+          "type": "text",
+          "value": "TK7"
+        },
+        "action": "rotary",
+        "hw_key_counter_clockwise": "[",
+        "hw_key_clockwise": "]"
+      },
+      "tk3": {
+        "label_primary": {
+          "type": "text",
+          "value": "TK3"
+        },
+        "action": "none",
+        "hw_key": "F7"
+      },
+      "tk4": {
+        "label_primary": {
+          "type": "text",
+          "value": "TK4"
+        },
+        "action": "none",
+        "hw_key": "F8"
+      },
+      "tk8": {
+        "type": "rotary",
+        "label_primary": {
+          "type": "text",
+          "value": "TK8"
+        },
+        "action": "rotary",
+        "hw_key_counter_clockwise": ",",
+        "hw_key_clockwise": "."
+      },
+      "tk5": {
+        "label_primary": {
+          "type": "text",
+          "value": "TK5"
+        },
+        "action": "none",
+        "hw_key": "F9"
+      },
+      "tk6": {
+        "label_primary": {
+          "type": "text",
+          "value": "TK6"
+        },
+        "action": "none",
+        "hw_key": "F10"
+      }
+    }
+  },
+  "leftkeys": {
+    "usemode": "hidden",
+    "default_color": "#3a3d40",
+    "keys": {
+      "tl1": {
+        "label_primary": {
+          "type": "text",
+          "value": "TL1"
+        },
+        "action": "none"
+      },
+      "tl2": {
+        "label_primary": {
+          "type": "text",
+          "value": "TL2"
+        },
+        "action": "none"
+      },
+      "tl3": {
+        "label_primary": {
+          "type": "text",
+          "value": "TL3"
+        },
+        "action": "none"
+      },
+      "tl4": {
+        "label_primary": {
+          "type": "text",
+          "value": "TL4"
+        },
+        "action": "none"
+      },
+      "tl5": {
+        "label_primary": {
+          "type": "text",
+          "value": "TL5"
+        },
+        "action": "none"
+      },
+      "tl6": {
+        "label_primary": {
+          "type": "text",
+          "value": "TL6"
+        },
+        "action": "none"
+      }
+    }
+  },
+  "rightkeys": {
+    "usemode": "hidden",
+    "default_color": "#3a3d40",
+    "keys": {
+      "tr1": {
+        "label_primary": {
+          "type": "text",
+          "value": "TR1"
+        },
+        "action": "none"
+      },
+      "tr2": {
+        "label_primary": {
+          "type": "text",
+          "value": "TR2"
+        },
+        "action": "none"
+      },
+      "tr3": {
+        "label_primary": {
+          "type": "text",
+          "value": "TR3"
+        },
+        "action": "none"
+      },
+      "tr4": {
+        "label_primary": {
+          "type": "text",
+          "value": "TR4"
+        },
+        "action": "none"
+      },
+      "tr5": {
+        "label_primary": {
+          "type": "text",
+          "value": "TR5"
+        },
+        "action": "none"
+      },
+      "tr6": {
+        "label_primary": {
+          "type": "text",
+          "value": "TR6"
+        },
+        "action": "none"
+      }
+    }
+  }
+}

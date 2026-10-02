@@ -1,0 +1,93 @@
+{% extends "dispatch/base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="layout">
+<aside class="sidebar">
+<div class="tabs"><button class="tab active" data-view="channels">pocChannels</button><button class="tab" data-view="units">UNITS</button></div>
+<input id="search" class="search" placeholder="Zoek in pocChannels en Units...">
+<section id="channelsSection"><div class="section-title">pocChannels</div><div class="tile-grid">
+{% for channel in channels %}
+<article class="tile channel-tile" data-id="{{ channel.id }}" data-name="{{ channel.name|escape }}" data-search="{{ channel.name|lower }}">
+<div class="tile-head"><button class="audio always" title="Audiomodus" aria-label="Audiomodus"><span class="material-symbols-rounded" aria-hidden="true">volume_up</span></button><span class="mode">POC</span><button class="settings" title="Instellingen" aria-label="Instellingen"><span class="material-symbols-rounded" aria-hidden="true">settings</span></button></div>
+<div class="tile-body"><div class="primary">{{ channel.name }}</div><div class="secondary"></div></div>
+</article>
+{% endfor %}
+</div></section>
+<section id="unitsSection"><div class="section-title">UNITS</div><div class="tile-grid">
+{% for unit in units %}
+<article class="tile unit-tile" data-id="{{ unit.id }}" data-name="{{ unit.external_name|escape }}" data-channel="{{ unit.current_channel_id|default:'' }}" data-search="{{ unit.external_name|lower }} {{ unit.current_channel.name|lower }}">
+<div class="tile-head"><button class="audio always" title="Audiomodus" aria-label="Audiomodus"><span class="material-symbols-rounded" aria-hidden="true">volume_up</span></button><span class="mode">Direct</span><button class="settings" title="Instellingen" aria-label="Instellingen"><span class="material-symbols-rounded" aria-hidden="true">settings</span></button></div>
+<div class="tile-body"><div class="primary">{{ unit.external_name }}</div><div class="secondary">{{ unit.current_channel.name }}</div></div>
+</article>
+{% endfor %}
+</div></section>
+</aside>
+<main class="workspace">
+
+<section id="radioPanel" class="radio radio-console">
+  <div class="radio-left-controls">
+    <button id="powerButton" class="round-control" title="Radio aan/uit" aria-label="Radio aan/uit"><span class="material-symbols-rounded" aria-hidden="true">power_settings_new</span></button>
+    <div class="led" aria-label="Radio status"></div>
+    <button id="radioSettingsButton" class="round-control settings-front" title="Radio-instellingen" aria-label="Radio-instellingen"><span class="material-symbols-rounded" aria-hidden="true">settings</span></button>
+  </div>
+
+  <div class="volume-column">
+    <button id="speakerMuteButton" class="speaker-mute" title="Dempen / dempen opheffen" aria-label="Dempen / dempen opheffen" aria-pressed="false"><span class="material-symbols-rounded" aria-hidden="true">volume_up</span></button>
+    <input id="frontMasterVolume" class="vertical-volume" type="range" min="0" max="100" value="100" orient="vertical">
+  </div>
+
+  <div class="radio-center">
+    <div id="radioDisplay" class="display idle">
+      <div class="display-header">GESELECTEERDE pocChannels</div>
+      <div class="display-body"><div class="display-primary">Geen selectie</div></div>
+    </div>
+
+    <div class="function-keys">
+      <button class="function-key" data-function-key="0"><span>-</span></button>
+      <button class="function-key" data-function-key="1"><span>-</span></button>
+      <button class="function-key" data-function-key="2"><span>-</span></button>
+      <button class="function-key" data-function-key="3"><span>-</span></button>
+    </div>
+  </div>
+
+  <button id="dispatchPtt" class="ptt" disabled>PTT</button>
+</section>
+<div class="overview-title">ACTIEVE UNITS PER CHANNEL</div><section class="cards">
+{% for channel in channels %}
+<article class="card" data-channel-card="{{ channel.id }}"><h3>{{ channel.name }}</h3><div class="unit-list" data-list="{{ channel.id }}"><div class="empty">Geen actieve Units</div></div></article>
+{% endfor %}
+</section>
+</main></div>
+<dialog id="modal"><div class="modal-head"><h2 id="modalTitle">Instellingen</h2><button id="modalClose" class="close">×</button></div><div class="modal-body">
+<div class="volume-row"><span>Speaker links</span><input id="leftVolume" type="range" min="0" max="100" value="100"><output id="leftValue">100</output></div>
+<div class="volume-row"><span>Speaker rechts</span><input id="rightVolume" type="range" min="0" max="100" value="100"><output id="rightValue">100</output></div>
+<div class="audio-mode-label">Audio mode</div><div class="mode-options"><button data-mode="always">Altijd</button><button data-mode="selected">Geselecteerd</button><button data-mode="muted">Gedempt</button></div>
+<div class="audio-mode-label">Hotkey kanaalselectie</div>
+<div class="hotkey-row"><span>Toets</span><button id="channelHotkey" class="hotkey-input" type="button">Niet toegewezen</button><button id="clearChannelHotkey" class="small-btn" type="button">Wissen</button></div>
+<div class="help">Klik op het toetsveld en druk daarna op een fysieke toets, bijvoorbeeld Numpad 1 of spatie.</div>
+</div></dialog>
+<dialog id="radioSettingsModal" class="master-dialog"><div class="modal-head"><h2>Radio-instellingen</h2><button id="radioSettingsClose" class="close">×</button></div><div class="modal-body">
+<div class="hotkey-row"><span>PTT-hotkey</span><button id="pttHotkey" class="hotkey-input" type="button">Niet toegewezen</button><button id="clearPttHotkey" class="small-btn" type="button">Wissen</button></div>
+<div class="master-volume"><span>Mastervolume</span><input id="masterVolume" type="range" min="0" max="100" value="100"><output id="masterVolumeValue">100</output></div>
+<div class="help">Hotkeys zijn alleen actief wanneer de radio is ingeschakeld. Browser- of systeemtoetsen kunnen door het besturingssysteem worden onderschept.</div>
+<table class="settings-table"><thead><tr><th>pocChannel name</th><th>Audio mode</th><th>Volume links</th><th>Volume rechts</th><th>Hotkey</th></tr></thead><tbody id="assignedChannelsBody"></tbody></table>
+<div class="function-config">
+  <h3>Functietoetsen onder het display</h3>
+  <div class="function-config-grid">
+    <span class="head">Toets</span><span class="head">Functie</span><span class="head">Channel</span>
+    <strong>F1</strong><select data-fn-action="0"></select><select data-fn-target="0"></select>
+    <strong>F2</strong><select data-fn-action="1"></select><select data-fn-target="1"></select>
+    <strong>F3</strong><select data-fn-action="2"></select><select data-fn-target="2"></select>
+    <strong>F4</strong><select data-fn-action="3"></select><select data-fn-target="3"></select>
+  </div>
+  <div class="help">Mogelijke functies: Channel selecteren, audio mode wisselen, alles dempen, radio aan/uit, noodoproep wissen en PTT.</div>
+</div>
+</div></dialog><div id="audioRoot"></div>
+{{ dispatch_poc_channels|json_script:"dispatch-poc-channels" }}
+{{ dispatch_units|json_script:"dispatch-units" }}
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'dispatch/js/dispatch-old.js' %}?v=20260818-pocchannels-v5" defer></script>
+{% endblock %}

@@ -1,0 +1,72 @@
+{% load static %}
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#071a35">
+  <title>Kies bediening</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,500,0,0">
+  <link rel="stylesheet" href="{% static 'engine_main/selection.css' %}?v=20260828-v49-identity-state">
+</head>
+<body data-server-now-ms="{{ server_now_ms }}" data-status-url="{% url 'engine_main:identity-status' selected_tenant.slug %}">
+  <main class="selection-shell">
+    <header class="selection-header">
+      <div class="selection-header-topline">
+        <p>{{ site_brand }}</p>
+        <span class="logged-in-user">Ingelogd: <strong>{{ request.user.get_full_name|default:request.user.username }}</strong></span>
+      </div>
+      <h1>Kies bediening voor {{ selected_tenant.name }}</h1>
+      <span>Selecteer de radio- of dispatchidentiteit waarmee je wilt werken.</span>
+    </header>
+
+    {% if error_message %}<div class="selection-error" role="alert">{{ error_message }}</div>{% endif %}
+
+    <section class="identity-grid" aria-label="Beschikbare identiteiten">
+      {% for choice in identity_choices %}
+      <form method="post" action="{% url 'engine_main:tenant-select' choice.tenant.slug %}" data-identity-form data-kind="{{ choice.kind }}" data-id="{{ choice.id }}">
+        {% csrf_token %}
+        <input type="hidden" name="kind" value="{{ choice.kind }}">
+        <input type="hidden" name="identity_id" value="{{ choice.id }}">
+        <button
+          class="identity-card identity-{{ choice.kind }} identity-state-{{ choice.availability.state }}"
+          type="submit"
+          data-identity-card
+          data-state="{{ choice.availability.state }}"
+          data-selectable="{{ choice.availability.selectable|yesno:'true,false' }}"
+          data-remaining-ms="{{ choice.availability.remaining_ms }}"
+          {% if not choice.availability.selectable and choice.availability.state != 'free' %}disabled{% endif %}
+        >
+          <span class="identity-type">{{ choice.label }}</span>
+          <strong>{{ choice.name }}</strong>
+          <span class="tenant-name">{{ choice.tenant.name }}</span>
+          <span class="identity-availability" data-availability>
+            <span class="identity-free" data-free {% if choice.availability.state != 'free' %}hidden{% endif %}>Vrij</span>
+            <span class="identity-occupied" data-occupied {% if choice.availability.state == 'free' %}hidden{% endif %}>
+              <span data-occupant>{% if choice.availability.occupant %}{{ choice.availability.occupant }}{% endif %}</span>
+              <span class="identity-lock" data-lock {% if choice.availability.state != 'stale' %}hidden{% endif %}>
+                <span class="material-symbols-rounded" aria-hidden="true">lock_clock</span>
+                <span data-countdown>05:00</span>
+              </span>
+            </span>
+          </span>
+        </button>
+      </form>
+      {% empty %}
+      <div class="empty-state">Aan dit account zijn geen POC- of DispatchUser-identiteiten gekoppeld.</div>
+      {% endfor %}
+    </section>
+    {% if multiple_tenants %}<a class="back-link" href="{% url 'engine_main:select' %}">Andere tenant kiezen</a>{% endif %}
+    {% if request.user.is_staff or request.user.is_superuser %}
+    <div class="admin-shortcut"><a class="admin-button" href="{% url 'admin:index' %}">Admin</a></div>
+    {% endif %}
+    <form method="post" action="{% url 'engine_main:logout' %}" class="logout-form">
+      {% csrf_token %}<button type="submit">Uitloggen</button>
+    </form>
+  </main>
+  <script src="{% static 'engine_main/selection.js' %}?v=20260828-v49-identity-state"></script>
+  <script src="{% static 'engine_main/dpad_navigation.js' %}?v=20260916-dpad-all-pages-v1"></script>
+</body>
+</html>

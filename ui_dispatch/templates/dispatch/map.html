@@ -1,0 +1,27 @@
+{% extends "dispatch/base.html" %}
+{% load static %}
+
+{% block title %}Kaart – {{ tenant.name }}{% endblock %}
+{% block body_class %}dispatch-map-page{% endblock %}
+{% block extra_head %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="">
+{% endblock %}
+
+{% block content %}
+<main class="dispatch-full-map" aria-label="Dispatch kaart">
+  <div class="dispatch-map-search dispatch-map-search-full" data-map-search>
+    <div class="dispatch-map-search-box">
+      <span class="material-symbols-rounded dispatch-map-search-icon" aria-hidden="true">search</span>
+      <input type="search" class="dispatch-map-search-input" data-map-search-input placeholder="Zoek radio" autocomplete="off" spellcheck="false" aria-label="Zoek radio op de kaart" aria-autocomplete="list" aria-expanded="false">
+    </div>
+    <div class="dispatch-map-search-results" data-map-search-results role="listbox" hidden></div>
+  </div>
+  <div id="dispatchFullMap" class="dispatch-map-canvas"></div>
+  <div id="dispatchFullMapEmpty" class="dispatch-map-empty" hidden>Geen recente locaties beschikbaar</div>
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+<script src="{% static 'dispatch/js/map.js' %}?v=20260916-map-tx-popup-v1" defer></script>
+{% endblock %}

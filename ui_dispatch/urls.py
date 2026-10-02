@@ -1,0 +1,45 @@
+from django.urls import path
+
+from . import views
+
+app_name = "dispatch"
+
+urlpatterns = [
+    path("", views.index, name="index"),
+    path("<slug:tenant_slug>/api/media-bootstrap/", views.media_bootstrap, name="media-bootstrap"),
+    path("<slug:tenant_slug>/api/webrtc/token/", views.webrtc_token, name="webrtc-token"),
+    path("<slug:tenant_slug>/api/heartbeat/", views.heartbeat, name="heartbeat"),
+    path("<slug:tenant_slug>/api/radio-settings/", views.radio_settings, name="radio-settings"),
+    path("<slug:tenant_slug>/api/call-requests/", views.call_requests, name="call-requests"),
+    path("<slug:tenant_slug>/api/channel-presence/", views.channel_presence, name="channel-presence"),
+    path("<slug:tenant_slug>/api/addressbook-status/", views.addressbook_connection_status, name="addressbook-status"),
+    path("<slug:tenant_slug>/api/locations/", views.dispatch_locations, name="locations"),
+    path("<slug:tenant_slug>/api/network/", views.network_state, name="network-state"),
+    path("<slug:tenant_slug>/api/states/", views.states_state, name="states-state"),
+    path("<slug:tenant_slug>/api/channels/<int:channel_id>/links/", views.link_channels, name="link-channels"),
+    path("<slug:tenant_slug>/api/channels/<int:channel_id>/links/remove/", views.unlink_channel_group, name="unlink-channel-group"),
+    path("<slug:tenant_slug>/api/channels/<int:channel_id>/links/clear/", views.clear_link_group, name="clear-link-group"),
+    path("<slug:tenant_slug>/api/channels/<int:channel_id>/links/<int:linked_channel_id>/remove/", views.unlink_channels, name="unlink-channels"),
+    path("<slug:tenant_slug>/api/channels/<slug:channel_slug>/ptt/request/", views.dispatch_ptt_request, name="ptt-request"),
+    path("<slug:tenant_slug>/api/channels/<slug:channel_slug>/ptt/release/", views.dispatch_ptt_release, name="ptt-release"),
+    path("<slug:tenant_slug>/api/channels/<slug:channel_slug>/ptt/revoke/", views.dispatch_ptt_revoke, name="ptt-revoke"),
+    path("<slug:tenant_slug>/api/channels/<slug:channel_slug>/parrot/start/", views.dispatch_parrot_start, name="parrot-start"),
+    path("<slug:tenant_slug>/api/channels/<slug:channel_slug>/parrot/stop/", views.dispatch_parrot_stop, name="parrot-stop"),
+    path("<slug:tenant_slug>/api/call-requests/<int:request_id>/clear/", views.clear_call_request, name="clear-call-request"),
+    path("<slug:tenant_slug>/api/call-requests/<int:request_id>/accept/", views.accept_call_request, name="accept-call-request"),
+    path("<slug:tenant_slug>/api/radios/<int:radio_id>/emergency/cancel/", views.cancel_radio_emergency, name="cancel-radio-emergency"),
+    path("<slug:tenant_slug>/api/radios/<int:radio_id>/status/", views.set_radio_user_status, name="set-radio-user-status"),
+    path("<slug:tenant_slug>/api/radios/<int:radio_id>/channel/", views.set_radio_channel, name="set-radio-channel"),
+    path("<slug:tenant_slug>/radio", views.radio_console, name="radio"),
+    path("<slug:tenant_slug>/radio/", views.radio_console, name="radio-slash"),
+    path("<slug:tenant_slug>/map", views.map_console, name="map"),
+    path("<slug:tenant_slug>/map/", views.map_console, name="map-slash"),
+    path("<slug:tenant_slug>/network", views.network_console, name="network"),
+    path("<slug:tenant_slug>/network/", views.network_console, name="network-slash"),
+    path("<slug:tenant_slug>/states", views.states_console, name="states"),
+    path("<slug:tenant_slug>/states/", views.states_console, name="states-slash"),
+    path("<slug:tenant_slug>/overview", views.console, name="overview"),
+    path("<slug:tenant_slug>/overview/", views.console, name="overview-slash"),
+    path("<slug:tenant_slug>/old/", views.console, name="old"),
+    path("<slug:tenant_slug>/", views.console_redirect, name="console"),
+]

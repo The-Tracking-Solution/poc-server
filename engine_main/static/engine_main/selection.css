@@ -1,0 +1,30 @@
+:root{color-scheme:dark;font-family:Arial,sans-serif;background:#071a35;color:#fff}
+*{box-sizing:border-box}body{margin:0;min-height:100vh;background:#071a35}
+.selection-shell{width:min(960px,calc(100% - 32px));margin:0 auto;padding:56px 0}
+.selection-header p{margin:0 0 8px;color:#64b5f6;font-weight:800;letter-spacing:.12em}
+.selection-header h1{margin:0 0 10px;font-size:clamp(28px,5vw,46px)}
+.selection-header span{color:#c7d5e8}.identity-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;margin-top:34px}
+.identity-grid form{margin:0}.identity-card{display:block;width:100%;min-height:170px;padding:22px;text-align:left;text-decoration:none;border:2px solid #315276;border-radius:14px;background:#102d52;color:#fff;cursor:pointer;transition:.15s transform,.15s border-color,.15s background}
+.identity-card:hover,.identity-card:focus-visible{transform:translateY(-2px);border-color:#79c2ff;background:#173b68;outline:none}
+.identity-dispatch{background:#293746}.identity-dispatch:hover,.identity-dispatch:focus-visible{background:#34495e}
+.identity-type{display:block;color:#8dccff;font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.1em}.identity-card strong{display:block;margin:20px 0 8px;font-size:24px}.tenant-name{color:#c7d5e8}
+.tenant-card{background:#16365f}.empty-state{grid-column:1/-1;padding:30px;border:1px solid #315276;border-radius:12px;background:#10233e}.back-link{display:inline-block;margin-top:26px;color:#8dccff}.logout-form{margin-top:28px}.logout-form button{padding:10px 18px;border:1px solid #67809d;border-radius:8px;background:#1e2d41;color:#fff;cursor:pointer}
+
+.admin-shortcut{margin-top:28px}.admin-button{display:inline-block;padding:11px 20px;border:2px solid #79c2ff;border-radius:9px;background:#0d4f82;color:#fff;font-weight:800;text-decoration:none}.admin-button:hover,.admin-button:focus-visible{background:#176aa7;outline:2px solid #fff;outline-offset:2px}
+
+/* V49 identity availability states */
+.selection-header-topline{display:flex;align-items:center;justify-content:space-between;gap:18px}.selection-header-topline p{margin-bottom:8px}.logged-in-user{font-size:14px;color:#d9e8f7}.logged-in-user strong{color:#fff}.selection-error{margin-top:22px;padding:12px 15px;border:1px solid #ff6b6b;border-radius:9px;background:#561f29;color:#fff;font-weight:700}
+.identity-card.identity-state-free{border-color:#35c56f;box-shadow:inset 0 0 0 1px rgba(53,197,111,.18)}.identity-card.identity-state-busy{border-color:#ef5350;box-shadow:inset 0 0 0 1px rgba(239,83,80,.18)}.identity-card.identity-state-stale{border-color:#ff9f1c;box-shadow:inset 0 0 0 1px rgba(255,159,28,.2)}
+.identity-card:disabled{cursor:not-allowed;opacity:1;transform:none}.identity-card.identity-state-busy:disabled:hover,.identity-card.identity-state-busy:disabled:focus-visible{border-color:#ef5350;background:inherit}.identity-card.identity-state-stale:disabled:hover,.identity-card.identity-state-stale:disabled:focus-visible{border-color:#ff9f1c;background:inherit}
+.identity-availability{display:flex;align-items:center;min-height:28px;margin-top:18px;padding-top:12px;border-top:1px solid rgba(255,255,255,.16);font-size:14px;font-weight:800}.identity-free{color:#68e39a}.identity-occupied{display:flex;align-items:center;justify-content:space-between;width:100%;gap:12px;color:#ff8b88}.identity-state-stale .identity-occupied{color:#ffbd59}.identity-lock{display:inline-flex;align-items:center;gap:5px;white-space:nowrap;color:#ffbd59}.identity-lock .material-symbols-rounded{font-size:21px;line-height:1}.identity-lock [data-countdown]{font-variant-numeric:tabular-nums;letter-spacing:.04em}
+@media(max-width:620px){.selection-header-topline{align-items:flex-start;flex-direction:column;gap:0}.logged-in-user{margin-bottom:14px}}
+
+/* Physical DPAD focus (Android radio handsets) */
+.identity-card:focus-visible,
+.admin-button:focus-visible,
+.back-link:focus-visible,
+.logout-form button:focus-visible {
+  outline: 3px solid #ff8a00 !important;
+  outline-offset: 3px;
+  box-shadow: 0 0 0 2px rgba(0,0,0,.55), 0 0 0 6px rgba(255,138,0,.28) !important;
+}

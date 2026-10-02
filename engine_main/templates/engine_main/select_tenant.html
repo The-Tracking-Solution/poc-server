@@ -1,0 +1,38 @@
+{% load static %}
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#071a35">
+  <title>Kies tenant</title>
+  <link rel="stylesheet" href="{% static 'engine_main/selection.css' %}?v=20260828-v46-cumulative-from-v44">
+</head>
+<body>
+  <main class="selection-shell">
+    <header class="selection-header">
+      <p>{{ site_brand }}</p>
+      <h1>Kies een tenant</h1>
+      <span>Selecteer eerst de organisatie waarin je wilt werken.</span>
+    </header>
+    <section class="identity-grid" aria-label="Beschikbare tenants">
+      {% for tenant in tenants %}
+      <a class="identity-card tenant-card" href="{% url 'engine_main:tenant-select' tenant.slug %}">
+        <span class="identity-type">Tenant</span>
+        <strong>{{ tenant.name }}</strong>
+        <span class="tenant-name">{{ tenant.slug }}</span>
+      </a>
+      {% empty %}
+      <div class="empty-state">Aan dit account zijn geen tenants gekoppeld.</div>
+      {% endfor %}
+    </section>
+    {% if request.user.is_staff or request.user.is_superuser %}
+    <div class="admin-shortcut"><a class="admin-button" href="{% url 'admin:index' %}">Admin</a></div>
+    {% endif %}
+    <form method="post" action="{% url 'engine_main:logout' %}" class="logout-form">
+      {% csrf_token %}<button type="submit">Uitloggen</button>
+    </form>
+  </main>
+  <script src="{% static 'engine_main/dpad_navigation.js' %}?v=20260916-dpad-all-pages-v1"></script>
+</body>
+</html>

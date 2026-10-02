@@ -1,0 +1,2299 @@
+/* Portrait is de enige leidende layout; geen orientation-specifieke overrides. */
+.connection-lost-banner{position:fixed;z-index:9999;top:max(10px,env(safe-area-inset-top));left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:8px;padding:8px 11px;border:1px solid #ff8a00;border-radius:7px;background:#181818;color:#fff;box-shadow:0 5px 20px rgba(0,0,0,.55);font-family:Arial,sans-serif}.connection-lost-banner[hidden]{display:none}.connection-lost-banner button{padding:6px 10px;border:1px solid #ffad42;border-radius:5px;background:#f57c00;color:#111;font-weight:900}.connection-lost-banner.reconnecting button{opacity:.55;pointer-events:none}
+:root {
+    /* Werkelijke zichtbare browserviewport; JS werkt deze waarden bij via visualViewport. */
+    --app-viewport-width: 100vw;
+    --app-viewport-height: 100dvh;
+
+    --device-padding: 1.5%;
+    --device-gap: 0.8%;
+    --button-gap: 2.5%;
+
+    --panel: #17191b;
+    --screen: #e8e8e8;
+    --screen-border: #303234;
+    --button-top: #3a3d40;
+    --button-bottom: #252729;
+    --button-border: #050607;
+    --screen-text: #090909;
+    --button-text: #f7f7f7;
+
+    /*
+     * Het normale display volgt de light/dark voorkeur van het device.
+     * Runtime radiostatussen overschrijven deze waarden tijdelijk.
+     */
+    --display-idle-bg: #f1f3f5;
+    --display-idle-fg: #111315;
+    --display-idle-border: #565a5e;
+    --display-tx-bg: #f57c00;
+    --display-tx-fg: #151515;
+    --display-rx-bg: #2e7d32;
+    --display-rx-fg: #ffffff;
+    --display-emergency-bg: #c62828;
+    --display-emergency-fg: #ffffff;
+    --display-private-bg: #4D007A;
+    --display-private-fg: #ffffff;
+
+    /*
+     * Eén vaste responsieve grootte voor P1-P4 en KeyPri.
+     * KeySec is exact 80% hiervan.
+     * Alle pijlen en OK gebruiken één aparte grootte.
+     */
+    /* Fallbacks; binnen .radio-device worden deze container-based overschreven. */
+    --key-primary-size: clamp(1rem, 3.2dvh, 3rem);
+    --key-secondary-size: calc(var(--key-primary-size) * 0.8);
+    --navigation-size: clamp(1.2rem, 5dvh, 5rem);
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --display-idle-bg: #17191b;
+        --display-idle-fg: #f5f7f8;
+        --display-idle-border: #555a5f;
+    }
+}
+
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
+}
+
+body {
+    background: #fff;
+    font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    user-select: none;
+    touch-action: manipulation;
+}
+
+button {
+    font: inherit;
+}
+
+/* DEV HARDWARE-OPSTELLING */
+
+.dev-hardware-shell {
+    width: var(--app-viewport-width);
+    height: var(--app-viewport-height);
+    padding:
+        max(1%, env(safe-area-inset-top))
+        max(1%, env(safe-area-inset-right))
+        max(1%, env(safe-area-inset-bottom))
+        max(1%, env(safe-area-inset-left));
+    display: grid;
+    grid-template-columns: minmax(0, 10fr) minmax(0, 80fr) minmax(0, 10fr);
+    grid-template-rows: minmax(0, 8fr) minmax(0, 92fr);
+    --hardware-shell-gap: clamp(.35rem, 1vmin, 1rem);
+    gap: var(--hardware-shell-gap);
+    background: #fff;
+    overflow: hidden;
+}
+
+.external-top-keys {
+    grid-column: 2;
+    grid-row: 1;
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(.3rem, 1vw, 1.1rem);
+    padding-bottom: var(--hardware-shell-gap, clamp(.35rem, 1vmin, 1rem));
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+.external-side-keys {
+    grid-row: 2;
+    min-width: 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: clamp(.4rem, 1.1dvh, 1rem);
+    padding-top: clamp(.25rem, 1dvh, .8rem);
+    overflow: hidden;
+}
+
+.external-left-keys { grid-column: 1; }
+.external-right-keys { grid-column: 3; }
+
+/*
+ * Externe toetsen zweven rond de radio. De containers hebben bewust geen
+ * radio-achtergrond, rand of paneel. Ontbrekende toetsen nemen geen ruimte in.
+ */
+.external-key,
+.rotary-key {
+    flex: 0 1 auto;
+}
+
+.external-key {
+    width: clamp(3.4rem, 7.2vw, 8.5rem);
+    min-width: 0;
+    height: clamp(3rem, 7dvh, 6.5rem);
+    padding: .25rem;
+    display: grid;
+    grid-template-rows: minmax(0, 60fr) minmax(0, 40fr);
+    color: var(--button-text);
+    background: linear-gradient(145deg, var(--button-top), var(--button-bottom));
+    border: clamp(1px, .22vmin, 4px) solid var(--button-border);
+    border-radius: clamp(7px, 1.1vmin, 18px);
+    box-shadow: inset 0 1px 3px rgb(255 255 255 / 15%), 0 2px 5px rgb(0 0 0 / 65%);
+    overflow: hidden;
+}
+
+.external-side-keys .external-key {
+    width: min(82%, 8.5rem);
+}
+
+.external-key .key-primary,
+.external-key .key-secondary {
+    width: 92%;
+    height: 92%;
+}
+
+.external-key .key-primary { align-items: end; }
+.external-key .key-secondary { align-items: start; }
+
+.rotary-key {
+    width: clamp(5.2rem, 10vw, 11rem);
+    height: clamp(3rem, 7dvh, 6.5rem);
+    display: grid;
+    grid-template-rows: 42% 58%;
+    color: var(--button-text);
+    background: linear-gradient(145deg, var(--button-top), var(--button-bottom));
+    border: clamp(1px, .22vmin, 4px) solid var(--button-border);
+    border-radius: clamp(7px, 1.1vmin, 18px);
+    box-shadow: inset 0 1px 3px rgb(255 255 255 / 15%), 0 2px 5px rgb(0 0 0 / 65%);
+    overflow: hidden;
+}
+
+.rotary-label {
+    display: grid;
+    place-items: center;
+    min-width: 0;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.rotary-controls {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    border-top: 1px solid rgb(255 255 255 / 22%);
+}
+
+.rotary-step {
+    min-width: 0;
+    min-height: 0;
+    padding: 0;
+    display: grid;
+    place-items: center;
+    color: inherit;
+    background: transparent;
+    border: 0;
+    font-size: clamp(1.1rem, 3dvh, 2.5rem);
+    cursor: pointer;
+}
+
+.rotary-step + .rotary-step {
+    border-left: 1px solid rgb(255 255 255 / 22%);
+}
+
+.external-key:active,
+.external-key.is-active,
+.rotary-step:active,
+.rotary-step.is-active {
+    filter: brightness(.78);
+}
+
+/* RADIO */
+
+.radio-device {
+    /* Alle typografie binnen de radio schaalt t.o.v. de radio zelf en niet t.o.v. browser-dvh. */
+    container-type: size;
+    --key-primary-size: clamp(1rem, 3.2cqh, 3rem);
+    --key-secondary-size: calc(var(--key-primary-size) * 0.8);
+    --navigation-size: clamp(1.2rem, 5cqh, 5rem);
+
+    grid-column: 2;
+    grid-row: 2;
+    width: 100%;
+    height: 100%;
+    padding: var(--device-padding);
+
+    display: grid;
+    grid-template-rows: var(--device-rows, minmax(0, 32fr) minmax(0, 20fr) minmax(0, 32fr) minmax(0, 8fr));
+    gap: var(--device-gap);
+
+    background: linear-gradient(145deg, #202326 0%, #0e1011 48%, #1b1d1f 100%);
+    border: clamp(3px, 0.5vmin, 9px) solid #090a0b;
+    border-radius: clamp(12px, 2vmin, 30px);
+    box-shadow:
+        inset 0 0 0 clamp(1px, 0.2vmin, 4px) #303336,
+        inset 0 0 clamp(12px, 2vmin, 30px) #000;
+    overflow: hidden;
+}
+
+.display-section,
+.navigation-section,
+.keypad-section,
+.softradio-section {
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+    background: var(--panel);
+}
+
+/*
+ * Een zichtbare hoofdsectie blijft altijd onderdeel van de gridverdeling,
+ * ook wanneer er geen data/knoppen in staan. Alleen [hidden] haalt een blok
+ * uit de layout. .is-empty-section is bewust alleen een state-hook en voegt
+ * geen tekst of placeholder toe.
+ */
+.display-section[hidden],
+.navigation-section[hidden],
+.keypad-section[hidden],
+.softradio-section[hidden] {
+    display: none !important;
+}
+
+.is-empty-section {
+    /* Het bestaande sectievlak blijft zichtbaar en reserveert zijn ruimte. */
+}
+
+/* DISPLAY */
+
+.display-section {
+    display: grid;
+    place-items: center;
+}
+
+.radio-screen {
+    position: relative;
+    width: 100%;
+    height: 100%;
+
+    display: grid;
+    grid-template-rows: var(--display-rows, minmax(0, 15fr) minmax(0, 10fr) minmax(0, 60fr) minmax(0, 15fr));
+
+    color: var(--display-fg, var(--display-idle-fg));
+    background: var(--display-bg, var(--display-idle-bg));
+    border: clamp(2px, 0.35vmin, 6px) solid var(--display-border, var(--display-idle-border));
+    transition: background-color 140ms ease, color 140ms ease, border-color 140ms ease;
+    border-radius: clamp(8px, 1.4vmin, 22px);
+    overflow: hidden;
+}
+
+/* Runtime-status heeft voorrang op het normale device light/dark thema. */
+.radio-screen[data-radio-state="idle"],
+.radio-screen:not([data-radio-state]) {
+    --display-bg: var(--display-idle-bg);
+    --display-fg: var(--display-idle-fg);
+    --display-border: var(--display-idle-border);
+}
+
+.radio-screen[data-radio-state="transmitting"] {
+    --display-bg: var(--display-tx-bg);
+    --display-fg: var(--display-tx-fg);
+    --display-border: color-mix(in srgb, var(--display-tx-bg) 70%, #000);
+}
+
+.radio-screen[data-radio-state="receiving"] {
+    --display-bg: var(--display-rx-bg);
+    --display-fg: var(--display-rx-fg);
+    --display-border: color-mix(in srgb, var(--display-rx-bg) 70%, #000);
+}
+
+.radio-screen[data-radio-state="emergency"] {
+    --display-bg: var(--display-emergency-bg);
+    --display-fg: var(--display-emergency-fg);
+    --display-border: color-mix(in srgb, var(--display-emergency-bg) 70%, #000);
+}
+
+.radio-screen[data-radio-state="private-call"],
+.radio-screen.is-private-call {
+    --display-bg: var(--display-private-bg);
+    --display-fg: var(--display-private-fg);
+    --display-border: color-mix(in srgb, var(--display-private-bg) 70%, #000);
+}
+
+.header-bar {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    min-width: 0;
+    min-height: 0;
+    padding-inline: 2%;
+    background: #001f3f;
+    color: #ffffff;
+    border-bottom: 1px solid #00152b;
+    font-weight: 800;
+    line-height: 1;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+#header_bar_text {
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: clip;
+    white-space: nowrap;
+    text-align: left;
+}
+
+.title-bar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.6em;
+    min-width: 0;
+    min-height: 0;
+    padding-inline: 2%;
+    border-bottom: 1px solid #555;
+    font-weight: 750;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.title-status {
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-align: left;
+}
+
+.title-presence {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.65em;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.title-presence[hidden] {
+    display: none !important;
+}
+
+.title-presence-group {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.14em;
+    min-width: 0;
+}
+
+.title-presence-group .material-symbols-outlined {
+    font-size: 1.15em;
+    line-height: 1;
+}
+
+.screen-content {
+    display: grid;
+    grid-template-rows: minmax(0, 62fr) minmax(0, 38fr);
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.primairy-txt,
+.secundairy-text {
+    width: 90%;
+    height: 90%;
+    margin: auto;
+
+    display: flex;
+    justify-content: center;
+    min-width: 0;
+    min-height: 0;
+
+    white-space: nowrap;
+    overflow: hidden;
+    line-height: 1;
+    text-align: center;
+}
+
+.primairy-txt {
+    align-items: end;
+    font-weight: 800;
+    gap: 0.28em;
+}
+
+.secundairy-text {
+    align-items: start;
+    font-weight: 700;
+}
+
+.softkey-panel {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    min-width: 0;
+    min-height: 0;
+    border-top: 1px solid #555;
+}
+
+.softkey {
+    min-width: 0;
+    min-height: 0;
+    padding: 0;
+
+    display: grid;
+    place-items: center;
+
+    background: linear-gradient(#f2f2f2, #dedede);
+    color: #111;
+    border: 0;
+    overflow: hidden;
+}
+
+.softkey + .softkey {
+    border-left: 1px solid #555;
+}
+
+.softkey-label {
+    width: 90%;
+    max-width: 90%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-align: center;
+    line-height: 1;
+    font-weight: 700;
+}
+
+/* BUTTON BASIS */
+
+.radio-button,
+.direction-button,
+.keypad-button {
+    min-width: 0;
+    min-height: 0;
+    padding: 0;
+
+    color: var(--button-text);
+    background: linear-gradient(145deg, var(--button-top), var(--button-bottom));
+    border: clamp(1px, 0.22vmin, 4px) solid var(--button-border);
+    border-radius: clamp(7px, 1.1vmin, 18px);
+    box-shadow:
+        inset 0 1px 3px rgb(255 255 255 / 15%),
+        0 2px 5px rgb(0 0 0 / 65%);
+    overflow: hidden;
+}
+
+.radio-button:active,
+.direction-button:active,
+.keypad-button:active,
+.radio-button.is-active,
+.direction-button.is-active,
+.keypad-button.is-active {
+    transform: translateY(1%);
+    background: linear-gradient(#202224, #111315);
+}
+
+/* NAVIGATION */
+
+.navigation-grid {
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-columns: 27% 40% 27%;
+    grid-template-rows: repeat(2, minmax(0, 1fr));
+    column-gap: 3%;
+    row-gap: 5%;
+}
+
+.p1 { grid-column: 1; grid-row: 1; }
+.p2 { grid-column: 3; grid-row: 1; }
+.p3 { grid-column: 1; grid-row: 2; }
+.p4 { grid-column: 3; grid-row: 2; }
+
+.direction-pad {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+
+    display: grid;
+    grid-template-columns: 30% 40% 30%;
+    grid-template-rows: 30% 40% 30%;
+    min-width: 0;
+    min-height: 0;
+}
+
+.nav-up    { grid-column: 2; grid-row: 1; }
+.nav-left  { grid-column: 1; grid-row: 2; }
+.nav-ok    { grid-column: 2; grid-row: 2; border-radius: 50%; }
+.nav-right { grid-column: 3; grid-row: 2; }
+.nav-down  { grid-column: 2; grid-row: 3; }
+
+.nav-label,
+.program-label {
+    width: 90%;
+    height: 90%;
+    margin: auto;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    white-space: nowrap;
+    overflow: hidden;
+    line-height: 1;
+    font-weight: 800;
+}
+
+/* KEYPAD */
+
+.keypad-section {
+    border: clamp(2px, 0.35vmin, 6px) solid #333638;
+    border-radius: clamp(8px, 1.4vmin, 22px);
+    box-shadow: inset 0 0 12px rgb(0 0 0 / 65%);
+}
+
+.numeric-keypad {
+    width: 100%;
+    height: 100%;
+
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-rows: repeat(4, minmax(0, 1fr));
+    gap: var(--button-gap);
+}
+
+.keypad-button {
+    display: grid;
+    grid-template-rows: minmax(0, 60fr) minmax(0, 40fr);
+}
+
+.key-primary,
+.key-secondary {
+    width: 90%;
+    height: 90%;
+    margin: auto;
+
+    display: flex;
+    justify-content: center;
+
+    white-space: nowrap;
+    overflow: hidden;
+    line-height: 1;
+}
+
+.key-primary {
+    align-items: end;
+    font-weight: 800;
+}
+
+.key-secondary {
+    align-items: start;
+    font-weight: 700;
+}
+
+/*
+ * Letterverhouding:
+ * KeySec wordt door JavaScript ingesteld op 80% van KeyPri.
+ * P1/P2/P3/P4 gebruiken exact dezelfde grootte als KeyPri.
+ */
+
+/* =========================================================
+   DEFINITIEVE TEKSTGROOTTES
+   Geen JavaScript-meting voor toetsen.
+   ========================================================= */
+
+.program-label,
+.key-primary {
+    font-size: var(--key-primary-size);
+}
+
+.key-secondary {
+    font-size: var(--key-secondary-size);
+}
+
+.nav-label {
+    font-size: var(--navigation-size);
+}
+
+/* Zorg dat P1-P4 exact gecentreerd worden. */
+.radio-button {
+    display: grid;
+    place-items: center;
+}
+
+/* De keypad-indeling blijft 60% KeyPri / 40% KeySec. */
+.keypad-button {
+    display: grid;
+    grid-template-rows: minmax(0, 60fr) minmax(0, 40fr);
+}
+
+
+/* =========================================================
+   DISPLAYTEKST - definitieve geometrie
+   ========================================================= */
+
+.primairy-txt,
+.secundairy-text,
+.title-bar {
+    max-width: none;
+    text-overflow: clip;
+}
+
+.primairy-txt {
+    width: 90%;
+    height: 90%;
+}
+
+
+/* =========================================================
+   DISPLAY EN SOFTKEYS — VASTE W-REFERENTIE
+   ========================================================= */
+
+/*
+ * Extra regelhoogte voorkomt dat letters met staarten,
+ * zoals g, j, p en y, aan de onderkant worden afgesneden.
+ */
+.title-bar,
+.primairy-txt,
+.secundairy-text,
+.softkey-label {
+    line-height: 1.22;
+    padding-block: 0.08em;
+}
+
+/* DisplayPri blijft binnen 90% van het middenvlak. */
+.primairy-txt {
+    width: 90%;
+    height: 90%;
+}
+
+/*
+ * OK gebruikt exact dezelfde tekstgrootte als KeyPri.
+ * Alleen de pijlen blijven de aparte navigatiegrootte gebruiken.
+ */
+.nav-ok .nav-label {
+    font-size: var(--key-primary-size);
+}
+
+
+/* =========================================================
+   DEFINITIEVE TEKSTREGELS
+   ========================================================= */
+
+.title-bar,
+.primairy-txt,
+.secundairy-text,
+.softkey-label {
+    line-height: 1.22;
+    padding-block: 0.08em;
+}
+
+.program-label,
+.nav-label {
+    font-size: var(--key-primary-size) !important;
+}
+
+/*
+ * Geen !important voor keypad- en functietoetslabels.
+ * dev_screen.js moet per label een kleinere inline font-size kunnen instellen.
+ */
+.key-primary {
+    font-size: var(--key-primary-size);
+}
+
+.key-secondary {
+    font-size: var(--key-secondary-size);
+}
+
+
+/* =========================================================
+   KEYPAD-LAYOUTS
+   ========================================================= */
+
+.keypad-host,
+.keypad {
+    width: 100%;
+    min-width: 0;
+}
+
+.keypad-3x4 {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-rows: repeat(4, minmax(0, 1fr));
+    gap: var(--key-gap, 0.45rem);
+}
+
+.keypad-2x1-3 {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-rows: minmax(0, 2fr) minmax(0, 1fr);
+    gap: var(--key-gap, 0.45rem);
+}
+
+.keypad-2x1-3 .key-a {
+    grid-column: 1 / -1;
+    min-height: calc(2 * var(--key-height, 4rem));
+}
+
+.keypad-none {
+    display: none;
+}
+
+.keypad-custom {
+    display: grid;
+    place-items: center;
+    min-height: 8rem;
+    border: 2px dashed rgba(255, 255, 255, 0.35);
+    border-radius: 0.65rem;
+    color: rgba(255, 255, 255, 0.75);
+}
+
+.keypad-custom::before {
+    content: "Custom keypad";
+}
+
+/* Gebruik dezelfde knopstijl als het bestaande 3x4-keypad. */
+.keypad .keypad-button {
+    min-width: 0;
+    width: 100%;
+}
+
+
+.keypad-2x1-3 .key-b { grid-column:1; }
+.keypad-2x1-3 .key-c { grid-column:2; }
+.keypad-2x1-3 .key-d { grid-column:3; }
+
+
+/* =========================================================
+   DEFINITIEVE VOLVLAK DISPLAY-INDELING
+   ========================================================= */
+
+/*
+ * Het scherm gebruikt het volledige displayvlak.
+ * Geen losse marge, afgeronde binnenrand of ongebruikte stroken.
+ */
+.display-section {
+    display: block;
+    padding: 0;
+}
+
+.radio-screen {
+    width: 100%;
+    height: 100%;
+    border-radius: 0;
+    margin: 0;
+}
+
+/*
+ * Ook de inhoud gebruikt het volledige beschikbare schermvlak.
+ */
+.primairy-txt,
+.secundairy-text {
+    width: 100%;
+    max-width: 100%;
+    padding-inline: 2%;
+}
+
+.keypad-section {
+    display: block;
+}
+
+.keypad-host,
+.keypad {
+    height: 100%;
+}
+
+.keypad-2x1-3 {
+    height: 100%;
+}
+
+/*
+ * De layoutkiezer is definitief verwijderd.
+ */
+.keypad-layout-picker {
+    display: none !important;
+}
+
+/* =========================================================
+   JSON-KLEUREN EN MATERIAL SYMBOLS
+   ========================================================= */
+
+[hidden] {
+    display: none !important;
+}
+
+.softkey-panel {
+    grid-template-columns: repeat(var(--softkey-count, 3), minmax(0, 1fr));
+}
+
+.softkey,
+.radio-button,
+.direction-button,
+.keypad-button,
+.external-key,
+.rotary-key {
+    --key-background: #303336;
+    --key-foreground: #ffffff;
+
+    color: var(--key-foreground);
+    background: var(--key-background);
+    border-color: color-mix(in srgb, var(--key-foreground) 30%, transparent);
+}
+
+.softkey {
+    background: var(--key-background);
+    color: var(--key-foreground);
+}
+
+.softkey:active,
+.radio-button:active,
+.direction-button:active,
+.keypad-button:active,
+.external-key:active,
+.softkey.is-active,
+.radio-button.is-active,
+.direction-button.is-active,
+.keypad-button.is-active {
+    background: var(--key-background);
+    color: var(--key-foreground);
+    filter: brightness(0.78);
+}
+
+.softkey-label,
+.program-label,
+.nav-label,
+.key-primary,
+.key-secondary,
+.key-icon {
+    color: inherit;
+}
+
+.material-symbols-outlined.key-icon {
+    font-family: "Material Symbols Outlined";
+    font-weight: normal;
+    font-style: normal;
+    font-size: 1em;
+    line-height: 1;
+    letter-spacing: normal;
+    text-transform: none;
+    display: inline-block;
+    white-space: nowrap;
+    word-wrap: normal;
+    direction: ltr;
+    -webkit-font-feature-settings: "liga";
+    -webkit-font-smoothing: antialiased;
+    font-feature-settings: "liga";
+    font-variation-settings: "FILL" 0, "wght" 600, "GRAD" 0, "opsz" 48;
+}
+
+.softkey-label.key-icon,
+.program-label.key-icon,
+.key-primary.key-icon {
+    font-size: var(--key-primary-size) !important;
+}
+
+.nav-label.key-icon {
+    font-size: var(--navigation-size) !important;
+}
+
+/* Standaard 3x4 blijft volledig ondersteund. */
+.keypad-3x4,
+.keypad-2x1-3 {
+    height: 100%;
+}
+
+
+/* =========================================================
+   DISPLAYTYPEN: DETAIL EN LIST
+   ========================================================= */
+
+.screen-content {
+    position: relative;
+}
+
+.detail-screen,
+.list-screen {
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.detail-screen {
+    display: grid;
+    grid-template-rows: minmax(0, 62fr) minmax(0, 38fr);
+}
+
+.list-screen {
+    background: var(--screen);
+}
+
+.screen-list {
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-auto-rows: minmax(2.25rem, 1fr);
+    align-content: start;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: none;
+}
+
+.screen-list::-webkit-scrollbar {
+    display: none;
+}
+
+.screen-list-item {
+    width: 100%;
+    min-width: 0;
+    padding: 0 4%;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.6rem;
+    color: #000;
+    background: linear-gradient(#f5f5f5, #e4e4e4);
+    border: 0;
+    border-bottom: 1px solid #9b9b9b;
+    border-radius: 0;
+    text-align: left;
+    overflow: hidden;
+}
+
+.screen-list-item-label {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: clamp(0.9rem, 3.2dvh, 2.2rem);
+    font-weight: 700;
+}
+
+.screen-list-item-type {
+    opacity: 0.62;
+    font-size: clamp(0.65rem, 2dvh, 1.2rem);
+    text-transform: uppercase;
+}
+
+.screen-list-item.is-selected,
+.screen-list-item:focus-visible {
+    color: #fff;
+    background: #111;
+    outline: 3px solid #ff8a00;
+    outline-offset: -3px;
+}
+
+.screen-list-empty {
+    width: 100%;
+    height: 100%;
+    display: grid;
+    place-items: center;
+    padding: 1rem;
+    text-align: center;
+    font-weight: 700;
+}
+
+
+/* Link terug naar de hardwareprofielkeuze. */
+.profile-switch {
+    position: fixed;
+    z-index: 20;
+    top: max(.55rem, env(safe-area-inset-top));
+    right: max(.55rem, env(safe-area-inset-right));
+    padding: .45rem .65rem;
+    color: #fff;
+    background: rgb(0 0 0 / 72%);
+    border: 1px solid rgb(255 255 255 / 30%);
+    border-radius: .45rem;
+    font-size: clamp(.7rem, 1.8vmin, .9rem);
+    font-weight: 750;
+    text-decoration: none;
+    backdrop-filter: blur(5px);
+}
+.profile-switch:hover,
+.profile-switch:focus-visible {
+    background: #1f5f9d;
+    outline: 2px solid #fff;
+    outline-offset: 2px;
+}
+
+/* =========================================================
+   UITLIJNING TOETSINHOUD — 2026-07-30
+   ========================================================= */
+
+/*
+ * Material Symbols hebben eigen font-metrics. Door het icoon als een
+ * volledig gecentreerde flexbox te behandelen, staat het optisch gelijk
+ * aan gewone tekst en niet op de tekst-baseline.
+ */
+.key-icon {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    padding: 0;
+    line-height: 1 !important;
+    vertical-align: middle;
+    font-variation-settings: "FILL" 0, "wght" 700, "GRAD" 0, "opsz" 48;
+}
+
+/* P1-P4: zowel tekst als icoon exact horizontaal en verticaal centreren. */
+.radio-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.program-label {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0.08em;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
+    line-height: 1;
+}
+
+.program-label.key-icon {
+    font-size: var(--key-primary-size) !important;
+}
+
+/* Navigatiepijlen en OK exact in het midden van iedere knop. */
+.direction-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+}
+
+.nav-label {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    text-align: center;
+    line-height: 1;
+}
+
+.nav-label.key-icon {
+    font-size: var(--navigation-size) !important;
+}
+
+.nav-ok .nav-label {
+    font-size: var(--key-primary-size) !important;
+}
+
+/*
+ * Keypad: reserveer boven en onder dezelfde veilige binnenruimte.
+ * Daardoor raakt KeySec de onderrand niet en blijft de primaire regel
+ * op alle toetsen op dezelfde hoogte staan.
+ */
+.keypad-button {
+    padding-block: clamp(0.18rem, 0.8dvh, 0.5rem);
+    padding-inline: 0;
+    grid-template-rows: minmax(0, 58fr) minmax(0, 42fr);
+}
+
+.key-primary,
+.key-secondary {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding-inline: 0.08em;
+
+    display: flex;
+    justify-content: center;
+
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+/* Primaire tekst en primaire iconen delen exact dezelfde positie. */
+.key-primary {
+    align-items: flex-end;
+    padding-bottom: 0.06em;
+    line-height: 1;
+}
+
+.key-primary.key-icon {
+    align-items: flex-end;
+    font-size: var(--key-primary-size) !important;
+    line-height: 1 !important;
+    padding-bottom: 0.02em;
+}
+
+/*
+ * KeySec begint bovenaan de onderste rij, maar krijgt extra ruimte aan
+ * de onderzijde. Dit corrigeert vooral lage tekens zoals '_' en '#'.
+ */
+.key-secondary {
+    align-items: flex-start;
+    padding-top: 0.08em;
+    padding-bottom: 0.22em;
+    line-height: 1.05;
+}
+
+
+/* =========================================================
+   F1-F4: zelfde KeyPri / KeySec-indeling als de keypad-toetsen
+   Verwacht:
+       F1
+       Menu
+   ========================================================= */
+
+.radio-button.function-key {
+    display: grid;
+    grid-template-rows: minmax(0, 58fr) minmax(0, 42fr);
+    align-items: stretch;
+    justify-items: stretch;
+
+    padding-block: clamp(0.18rem, 0.8dvh, 0.5rem);
+    padding-inline: 0;
+}
+
+.radio-button.function-key .key-primary,
+.radio-button.function-key .key-secondary {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding-inline: 0.08em;
+
+    display: flex;
+    justify-content: center;
+
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.radio-button.function-key .key-primary {
+    align-items: flex-end;
+    padding-bottom: 0.06em;
+    line-height: 1;
+}
+
+.radio-button.function-key .key-secondary {
+    align-items: flex-start;
+    padding-top: 0.08em;
+    padding-bottom: 0.22em;
+    line-height: 1.05;
+}
+
+/* Een lege secundaire regel blijft bestaan, zodat F1-F4 gelijk uitlijnen. */
+.radio-button.function-key .key-secondary:empty {
+    display: flex;
+}
+
+
+/* =========================================================
+   LIJSTSCHERM GEBRUIKT DE VOLLEDIGE DISPLAY-INHOUD
+   ========================================================= */
+
+/*
+ * .screen-content heeft twee gridrijen voor het detailscherm.
+ * Zonder expliciete grid-area kwam het lijstscherm slechts in één rij terecht.
+ * Zowel detail als lijst krijgen nu de volledige beschikbare ruimte tussen
+ * de schermtitel en de softkeys.
+ */
+.detail-screen,
+.list-screen {
+    grid-column: 1;
+    grid-row: 1 / -1;
+}
+
+/* De lijst vult de volledige beschikbare hoogte. */
+.list-screen,
+.screen-list {
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+}
+
+/* Verdeel zichtbare menu-items gelijkmatig over de volledige lijsthoogte. */
+.screen-list {
+    grid-auto-rows: minmax(0, 1fr);
+    align-content: stretch;
+}
+
+/* Houd tekst ruim en leesbaar zonder onnodige verticale marges. */
+.screen-list-item {
+    min-height: 0;
+    padding-block: clamp(0.2rem, 0.8dvh, 0.55rem);
+}
+
+
+/* =========================================================
+   KNOPTEKST: AUTOFIT EN VEILIGE LETTERONDERKANT
+   ========================================================= */
+
+.keypad-button .key-primary,
+.keypad-button .key-secondary,
+.radio-button.function-key .key-primary,
+.radio-button.function-key .key-secondary {
+    box-sizing: border-box;
+    max-width: 100%;
+    min-width: 0;
+
+    /* Voorkomt afkappen van staarten van g, j, p, q en y. */
+    line-height: 1.18;
+    overflow: hidden;
+}
+
+/* Primaire regel houdt voldoende ruimte onder de tekst. */
+.keypad-button .key-primary,
+.radio-button.function-key .key-primary {
+    padding-top: 0.02em;
+    padding-bottom: 0.12em;
+}
+
+/* Secundaire regel krijgt expliciet ruimte voor descenders. */
+.keypad-button .key-secondary,
+.radio-button.function-key .key-secondary {
+    padding-top: 0.04em;
+    padding-bottom: 0.28em;
+}
+
+/*
+ * De JavaScript-autofit schrijft een kleinere inline font-size wanneer
+ * het werkelijke label niet past. Daarom hier geen !important gebruiken.
+ */
+.keypad-button .key-primary,
+.keypad-button .key-secondary,
+.radio-button.function-key .key-primary,
+.radio-button.function-key .key-secondary {
+    text-overflow: clip;
+}
+
+.radio-button:disabled,
+.direction-button:disabled,
+.keypad-button:disabled,
+.softkey:disabled,
+.is-disabled {
+    cursor: not-allowed;
+    opacity: .45;
+}
+
+
+/* Op zeer smalle schermen blijven de hardwaretoetsen zichtbaar, maar compacter. */
+@media (max-width: 720px) {
+    .dev-hardware-shell {
+        grid-template-columns: minmax(0, 10fr) minmax(0, 80fr) minmax(0, 10fr);
+        grid-template-rows: minmax(0, 8fr) minmax(0, 92fr);
+    }
+    .external-top-keys { gap: .22rem; }
+    .external-key { width: clamp(2.6rem, 8vw, 4rem); }
+    .rotary-key { width: clamp(4.2rem, 13vw, 6rem); }
+}
+
+
+/* =========================================================
+   DEV TESTVIEWER: LOGISCHE RADIO-AFMETING + AUTOMATISCHE SCHAAL
+   ========================================================= */
+
+body {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+}
+
+.dev-test-toolbar {
+    z-index: 30;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .8rem;
+    padding:
+        max(.55rem, env(safe-area-inset-top))
+        max(.7rem, env(safe-area-inset-right))
+        .55rem
+        max(.7rem, env(safe-area-inset-left));
+    color: #f5f5f5;
+    background: #17191b;
+    border-bottom: 1px solid #34383c;
+    box-shadow: 0 2px 8px rgb(0 0 0 / 28%);
+}
+
+.dev-size-controls {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: .65rem;
+    flex-wrap: wrap;
+}
+
+.dev-size-title {
+    margin-right: .25rem;
+    white-space: nowrap;
+}
+
+.dev-size-field {
+    display: inline-flex;
+    align-items: center;
+    gap: .3rem;
+    font-size: .86rem;
+    font-weight: 700;
+}
+
+.dev-size-field input {
+    width: 5.8rem;
+    min-height: 2rem;
+    padding: .25rem .4rem;
+    color: #111;
+    background: #fff;
+    border: 1px solid #777;
+    border-radius: .35rem;
+    font: inherit;
+}
+
+.dev-size-apply {
+    min-height: 2rem;
+    padding: .3rem .7rem;
+    color: #fff;
+    background: #275f95;
+    border: 1px solid #4a82b7;
+    border-radius: .35rem;
+    cursor: pointer;
+}
+
+.dev-size-status {
+    min-width: 8rem;
+    color: #c9d2da;
+    font-size: .8rem;
+    white-space: nowrap;
+}
+
+/* De profielkeuze maakt nu deel uit van de toolbar in plaats van de viewer. */
+.profile-switch {
+    position: static;
+    flex: 0 0 auto;
+    font-size: .8rem;
+}
+
+.dev-viewer-stage {
+    position: relative;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+    display: grid;
+    place-items: center;
+    padding: clamp(.35rem, 1vmin, 1rem);
+    background: #fff;
+}
+
+/*
+ * Deze box neemt exact de geschaalde afmeting in. De hardware-shell zelf
+ * behoudt zijn logische pixelmaten en wordt uitsluitend visueel geschaald.
+ */
+.dev-viewer-scale-box {
+    position: relative;
+    width: 0;
+    height: 0;
+    min-width: 0;
+    min-height: 0;
+}
+
+.dev-hardware-shell {
+    --dev-radio-width: 390px;
+    --dev-radio-height: 844px;
+    --dev-side-width: calc(var(--dev-radio-width) * .125);
+    --dev-top-height: calc(var(--dev-radio-height) * .0869565);
+    --dev-shell-gap: calc(var(--dev-radio-width) * .018);
+
+    position: absolute;
+    inset: 0 auto auto 0;
+    width: calc(var(--dev-radio-width) + (2 * var(--dev-side-width)) + (2 * var(--dev-shell-gap)));
+    height: calc(var(--dev-radio-height) + var(--dev-top-height) + var(--dev-shell-gap));
+    padding: 0;
+    grid-template-columns: var(--dev-side-width) var(--dev-radio-width) var(--dev-side-width);
+    grid-template-rows: var(--dev-top-height) var(--dev-radio-height);
+    gap: var(--dev-shell-gap);
+    transform-origin: top left;
+}
+
+.radio-device {
+    width: var(--dev-radio-width);
+    height: var(--dev-radio-height);
+}
+
+/* Externe hardwaretoetsen schalen logisch mee met het gekozen radioformaat. */
+.external-top-keys {
+    gap: calc(var(--dev-radio-width) * .009);
+}
+
+.external-side-keys {
+    gap: calc(var(--dev-radio-height) * .012);
+    padding-top: calc(var(--dev-radio-height) * .008);
+}
+
+.external-key {
+    width: calc(var(--dev-radio-width) * .105);
+    height: calc(var(--dev-radio-height) * .072);
+}
+
+.external-side-keys .external-key {
+    width: 82%;
+    height: calc(var(--dev-radio-height) * .072);
+}
+
+.rotary-key {
+    width: calc(var(--dev-radio-width) * .145);
+    height: calc(var(--dev-radio-height) * .072);
+}
+
+@media (max-width: 720px) {
+    .dev-hardware-shell {
+        grid-template-columns: var(--dev-side-width) var(--dev-radio-width) var(--dev-side-width);
+        grid-template-rows: var(--dev-top-height) var(--dev-radio-height);
+    }
+
+    .external-key { width: calc(var(--dev-radio-width) * .105); }
+    .rotary-key { width: calc(var(--dev-radio-width) * .145); }
+}
+
+@media (max-width: 620px) {
+    .dev-test-toolbar {
+        align-items: flex-start;
+    }
+
+    .dev-size-title {
+        width: 100%;
+    }
+
+    .dev-size-status {
+        width: 100%;
+    }
+}
+
+
+/* =========================================================
+   DEV SPLIT VIEW: LINKS SCHAALBAAR, RECHTS VOLLEDIGE RADIO
+   ========================================================= */
+
+body {
+    display: block;
+}
+
+.dev-split-layout {
+    width: var(--app-viewport-width);
+    height: var(--app-viewport-height);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    background: #fff;
+    overflow: hidden;
+}
+
+.dev-left-pane {
+    min-width: 0;
+    min-height: 0;
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr);
+    overflow: hidden;
+}
+
+.dev-right-pane {
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+    border-left: 2px solid #c7cbd0;
+    background: #fff;
+}
+
+.dev-full-radio-frame {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    background: #fff;
+}
+
+/*
+ * Inspection mode wordt uitsluitend in het rechter iframe gebruikt.
+ * Hier bestaat geen Width/Height-testviewport en geen transform-schaal.
+ * De radio-opstelling gebruikt gewoon de volledige beschikbare iframe-ruimte.
+ */
+.dev-inspection-mode body {
+    display: block;
+    overflow: hidden;
+}
+
+.dev-inspection-mode .dev-split-layout {
+    display: block;
+    width: var(--app-viewport-width);
+    height: var(--app-viewport-height);
+}
+
+.dev-inspection-mode .dev-left-pane {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.dev-inspection-mode .dev-test-toolbar,
+.dev-inspection-mode .dev-right-pane {
+    display: none !important;
+}
+
+.dev-inspection-mode .dev-viewer-stage {
+    width: 100%;
+    height: 100%;
+    padding: clamp(.35rem, 1vmin, 1rem);
+    display: block;
+    overflow: hidden;
+}
+
+.dev-inspection-mode .dev-viewer-scale-box {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.dev-inspection-mode .dev-hardware-shell {
+    position: relative;
+    inset: auto;
+    width: 100%;
+    height: 100%;
+    padding:
+        max(1%, env(safe-area-inset-top))
+        max(1%, env(safe-area-inset-right))
+        max(1%, env(safe-area-inset-bottom))
+        max(1%, env(safe-area-inset-left));
+    grid-template-columns: minmax(4.5rem, 11fr) minmax(0, 78fr) minmax(4.5rem, 11fr);
+    grid-template-rows: minmax(4rem, 10fr) minmax(0, 90fr);
+    --hardware-shell-gap: clamp(.35rem, 1vmin, 1rem);
+    gap: var(--hardware-shell-gap);
+    transform: none !important;
+}
+
+.dev-inspection-mode .radio-device {
+    width: 100%;
+    height: 100%;
+}
+
+.dev-inspection-mode .external-top-keys {
+    gap: clamp(.3rem, 1vw, 1.1rem);
+}
+
+.dev-inspection-mode .external-side-keys {
+    gap: clamp(.4rem, 1.1dvh, 1rem);
+    padding-top: clamp(.25rem, 1dvh, .8rem);
+}
+
+.dev-inspection-mode .external-key {
+    width: clamp(3.4rem, 7.2vw, 8.5rem);
+    height: clamp(3rem, 7dvh, 6.5rem);
+}
+
+.dev-inspection-mode .external-side-keys .external-key {
+    width: min(82%, 8.5rem);
+    height: clamp(3rem, 7dvh, 6.5rem);
+}
+
+.dev-inspection-mode .rotary-key {
+    width: clamp(5.2rem, 10vw, 11rem);
+    height: clamp(3rem, 7dvh, 6.5rem);
+}
+
+@media (max-width: 900px) {
+    .dev-split-layout:not(.force-two-column) {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    }
+}
+
+/* SOFTRADIO */
+
+.softradio-section {
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+    background: var(--panel);
+    border: clamp(2px, 0.35vmin, 6px) solid #333638;
+    border-radius: clamp(8px, 1.4vmin, 22px);
+    box-shadow: inset 0 0 12px rgb(0 0 0 / 65%);
+}
+
+.softradio-host,
+.softradio-grid {
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
+}
+
+.softradio-grid {
+    display: grid;
+    gap: var(--button-gap);
+}
+
+.softradio-layout-1x1 {
+    grid-template-columns: minmax(0, 1fr);
+}
+
+/* 1x2 is bewust 2/3 links en 1/3 rechts. */
+.softradio-layout-1x2 {
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+}
+
+.softradio-layout-1x3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.softradio-button {
+    width: 100%;
+    height: 100%;
+}
+
+/* =========================================================
+   PRODUCTIE /tenant/<tenant>/
+   ========================================================= */
+html,
+body.tenant-radio-page {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
+    background: #fff;
+}
+
+body.tenant-radio-page {
+    min-width: 0;
+    min-height: 0;
+}
+
+.tenant-radio-page .tenant-hardware-stage {
+    width: var(--app-viewport-width);
+    height: var(--app-viewport-height);
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+}
+
+/* De productiepagina heeft geen testviewport. De complete radio-opstelling
+   gebruikt altijd de werkelijk beschikbare browserruimte. */
+.tenant-radio-page .dev-hardware-shell {
+    --dev-radio-width: 100%;
+    --dev-radio-height: 100%;
+
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    transform: none !important;
+    transform-origin: initial;
+}
+
+.tenant-radio-page .radio-device {
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+}
+
+/* Geen dev-toolbar, splitview of iframe in productie. */
+.tenant-radio-page .dev-test-toolbar,
+.tenant-radio-page .dev-split-layout,
+.tenant-radio-page .dev-left-pane,
+.tenant-radio-page .dev-right-pane,
+.tenant-radio-page .dev-viewer-stage,
+.tenant-radio-page .dev-viewer-scale-box,
+.tenant-radio-page .dev-full-radio-frame {
+    all: unset;
+}
+
+
+/* =========================================================
+   V3 FULL-SCREEN OVERRIDES
+   Maximaal gebruik van de beschikbare browserruimte.
+   ========================================================= */
+
+:root {
+    --page-background: #17191b;
+    --device-gap: 0.35%;
+    --device-padding: 0;
+}
+
+html,
+body {
+    background: var(--page-background) !important;
+}
+
+/* De hardware-shell zelf is geen radio-behuizing. Er wordt dus geen
+   buitenrand/padding gereserveerd. Externe TK/TL/TR-toetsen blijven zweven. */
+.dev-hardware-shell {
+    padding: 0 !important;
+    gap: 0 !important;
+    background: var(--page-background) !important;
+}
+
+/* De radio gebruikt zijn volledige toegewezen vlak. De oude decoratieve
+   buitenrand, radius en inset-shadow kostten bruikbare pixels. */
+.radio-device {
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    background: var(--panel) !important;
+}
+
+/* Alleen de keypad-knoppen worden getekend; geen extra kader rond de groep. */
+.keypad-section {
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    background: var(--panel) !important;
+}
+
+/* Dezelfde aanpak voor de nieuwe Softradio-knoppen: geen extra sectiekader. */
+.softradio-section {
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    background: var(--panel) !important;
+}
+
+.keypad-host,
+.keypad,
+.softradio-host,
+.softradio-grid {
+    width: 100% !important;
+    height: 100% !important;
+    margin: 0 !important;
+}
+
+/* Geen overbodige buitenmarge in de dev-testviewer/inspection-view. */
+.dev-viewer-stage,
+.dev-inspection-mode .dev-viewer-stage {
+    padding: 0 !important;
+    background: var(--page-background) !important;
+}
+
+.dev-split-layout,
+.dev-left-pane,
+.dev-right-pane,
+.dev-full-radio-frame {
+    background: var(--page-background) !important;
+}
+
+/* Houd alleen een subtiele scheiding tussen de twee dev-panelen. */
+.dev-right-pane {
+    border-left-color: #34383c !important;
+}
+
+/* Bij de schaalbare linker dev-view wordt geen extra shell-gap meer
+   meegerekend. De ingestelde Width/Height blijven exact de radiomaat. */
+.dev-viewer-stage .dev-hardware-shell {
+    --dev-shell-gap: 0px !important;
+}
+
+/* Productie: letterlijk de beschikbare viewport gebruiken. */
+.tenant-radio-page,
+.tenant-radio-page .tenant-hardware-stage,
+.tenant-radio-page .dev-hardware-shell {
+    width: var(--app-viewport-width) !important;
+    height: var(--app-viewport-height) !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    max-width: none !important;
+    max-height: none !important;
+    background: var(--page-background) !important;
+}
+
+.tenant-radio-page .radio-device {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+/* =========================================================
+   V3 SPACING
+   Ruimte tussen hoofdsecties = 2x de ruimte tussen toetsen.
+   Eén gedeelde pixel/vmin-maat voorkomt afwijkingen door %-gaps.
+   ========================================================= */
+:root {
+    --radio-key-gap: clamp(3px, 0.55vmin, 7px);
+    --radio-section-gap: calc(var(--radio-key-gap) * 2);
+}
+
+.radio-device {
+    row-gap: var(--radio-section-gap) !important;
+    column-gap: 0 !important;
+}
+
+/* Alleen echte toetsmatrices gebruiken de uniforme toetsafstand.
+   De navigatie heeft een eigen geometrie (P1-P4 rondom de d-pad) en
+   behoudt daarom zijn eigen kolom- en rijafstand. */
+.numeric-keypad,
+.softradio-grid {
+    gap: var(--radio-key-gap) !important;
+}
+
+/* Navigatie-layout expliciet herstellen. Percentages + gaps vormen samen
+   exact de bedoelde 3-koloms indeling. */
+.navigation-section .navigation-grid {
+    column-gap: 3% !important;
+    row-gap: 5% !important;
+}
+
+/* Keypad en softradio moeten exact hetzelfde kolomraster gebruiken.
+   Dit voorkomt dat de onderste softradio-rij optisch of werkelijk verschuift
+   ten opzichte van het 3x4-keyboard erboven. */
+.keypad-section,
+.softradio-section,
+.keypad-host,
+.softradio-host,
+.numeric-keypad,
+.softradio-grid,
+.keypad-button,
+.softradio-button {
+    box-sizing: border-box !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+}
+
+.numeric-keypad,
+.softradio-grid {
+    display: grid !important;
+    width: 100% !important;
+    height: 100% !important;
+    align-items: stretch !important;
+    justify-items: stretch !important;
+    justify-content: stretch !important;
+    align-content: stretch !important;
+}
+
+.softradio-layout-1x3 {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    grid-template-rows: minmax(0, 1fr) !important;
+}
+
+.softradio-layout-1x2 {
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) !important;
+    grid-template-rows: minmax(0, 1fr) !important;
+}
+
+.softradio-layout-1x1 {
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-rows: minmax(0, 1fr) !important;
+}
+
+.softradio-button {
+    margin: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+}
+
+
+/* =========================================================
+   MOBILE / VISUAL VIEWPORT FIX
+   Gebruik de werkelijk zichtbare browserruimte. Dit voorkomt dat mobiele
+   browserbalken een deel van de radio buiten beeld duwen.
+   ========================================================= */
+html, body {
+    width: var(--app-viewport-width);
+    height: var(--app-viewport-height);
+    max-width: var(--app-viewport-width);
+    max-height: var(--app-viewport-height);
+}
+
+.dev-split-layout,
+.dev-inspection-mode .dev-split-layout,
+.tenant-radio-page .tenant-hardware-stage {
+    width: var(--app-viewport-width) !important;
+    height: var(--app-viewport-height) !important;
+}
+
+/* Container-query units zorgen dat tekst en navigatieknoppen dezelfde
+   verhouding houden op desktop en mobiel, onafhankelijk van browserchrome. */
+@supports (font-size: 1cqh) {
+    .radio-device {
+        --key-primary-size: clamp(1rem, 3.2cqh, 3rem);
+        --key-secondary-size: calc(var(--key-primary-size) * .8);
+        --navigation-size: clamp(1.2rem, 5cqh, 5rem);
+    }
+}
+
+/* =========================================================
+   RUNTIME STATUSREGEL
+   ========================================================= */
+
+/*
+ * De secundaire displayregel bestaat uit een Material Symbol en optioneel
+ * de radionaam. De iconen erven exact dezelfde schaal als de statusregel.
+ */
+.secundairy-text {
+    gap: 0.28em;
+}
+
+.runtime-status-icon,
+.runtime-status-text {
+    flex: 0 0 auto;
+    line-height: 1.1;
+}
+
+.runtime-status-icon {
+    font-size: 1em;
+    font-variation-settings: "FILL" 0, "wght" 600, "GRAD" 0, "opsz" 24;
+}
+
+/* Softkeys in het display tonen altijd de exact ingestelde, volle kleur. */
+.softkey,
+.softkey:disabled,
+.softkey.is-active,
+.softkey:active {
+    opacity: 1;
+    background-color: var(--key-background);
+    background-image: none;
+    color: var(--key-foreground);
+}
+
+
+/* === UNIFIED RADIO RELEASE V32 ===
+   Release: 20260820-unified-radio-v32
+   Canonieke productielayout voor /radio/<tenant>/.
+   Deze regels staan als laatste om oude dev/legacy-regels nooit de productie-
+   geometrie of menubalk te laten overschrijven.
+*/
+.tenant-radio-page .dev-hardware-shell {
+    grid-template-columns: minmax(0, 10fr) minmax(0, 80fr) minmax(0, 10fr);
+    grid-template-rows: minmax(0, 8fr) minmax(0, 92fr);
+}
+
+.tenant-radio-page .external-top-keys {
+    grid-column: 2;
+    grid-row: 1;
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
+    align-items: stretch;
+}
+
+.tenant-radio-page .external-top-keys > .external-key,
+.tenant-radio-page .external-top-keys > .rotary-key {
+    flex: 1 1 0;
+    width: auto;
+    max-width: none;
+    height: 100%;
+    min-width: 0;
+    min-height: 0;
+}
+
+.tenant-radio-page .external-left-keys {
+    grid-column: 1;
+    grid-row: 2;
+}
+
+.tenant-radio-page .radio-device {
+    grid-column: 2;
+    grid-row: 2;
+    grid-template-rows: var(
+        --device-rows,
+        minmax(0, 32fr)
+        minmax(0, 20fr)
+        minmax(0, 32fr)
+        minmax(0, 8fr)
+    );
+}
+
+.tenant-radio-page .external-right-keys {
+    grid-column: 3;
+    grid-row: 2;
+}
+
+.tenant-radio-page .radio-screen {
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-rows: var(
+        --display-rows,
+        minmax(0, 15fr)
+        minmax(0, 10fr)
+        minmax(0, 60fr)
+        minmax(0, 15fr)
+    );
+}
+
+.tenant-radio-page .radio-screen > .header-bar {
+    grid-column: 1;
+    grid-row: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    min-height: 0;
+    background: #001f3f !important;
+    background-image: none !important;
+    color: #ffffff !important;
+    border-bottom: 1px solid #00152b;
+    opacity: 1 !important;
+}
+
+.tenant-radio-page .radio-screen > .title-bar {
+    grid-column: 1;
+    grid-row: 2;
+}
+
+.tenant-radio-page .radio-screen > .screen-content {
+    grid-column: 1;
+    grid-row: 3;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.tenant-radio-page .radio-screen > .softkey-panel {
+    grid-column: 1;
+    grid-row: 4;
+    min-width: 0;
+    min-height: 0;
+}
+
+.tenant-radio-page #header_bar_text {
+    color: #ffffff !important;
+}
+
+
+/* Audio diagnostics (?debug=1) */
+.audio-debug-overlay {
+    position: fixed; z-index: 10000; left: 4px; right: 4px; bottom: 4px;
+    display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px; align-items: end;
+    padding: 6px; border: 1px solid #4dff83; border-radius: 5px;
+    background: rgba(0, 0, 0, .86); color: #4dff83; font: 11px/1.3 monospace; user-select: text;
+}
+.audio-debug-overlay pre { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.audio-debug-overlay button { min-height: 34px; padding: 4px 8px; border: 1px solid #4dff83; border-radius: 4px; background: #152018; color: #fff; font: 700 11px/1.1 sans-serif; }
+
+
+/* === STICKY TOUCH PTT V37 ===
+   Een kleine vingerbeweging mag geen browser-pan/scroll gesture starten en
+   daardoor pointercancel/PTT-end veroorzaken.
+*/
+.tenant-radio-page button[data-key],
+.tenant-radio-page .external-key,
+.tenant-radio-page .rotary-key,
+.tenant-radio-page .softkey,
+.tenant-radio-page .nav-key,
+.tenant-radio-page .keyboard-key {
+    touch-action: none;
+    -ms-touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+}
+
+
+/* === CONNECTION LOST SCREEN V41 === */
+.runtime-connection-icon {
+    font-size: clamp(3rem, 12cqh, 7rem);
+    line-height: 1;
+}
+
+body[data-radio-connection-lost="1"] button[data-key] {
+    opacity: .55;
+}
+
+
+/* === DISPLAY ZONES V44 === */
+#header_bar_text,
+#title_status,
+#title_presence,
+#primairy_txt,
+#secundairy_text {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: clip;
+}
+
+#primairy_txt,
+#secundairy_text {
+    width: 100%;
+    max-width: 100%;
+    padding-inline: 2%;
+}
+
+/*
+ * Font-size op primary/secondary wordt door tenant_screen.js berekend:
+ * huidige vormgeving = maximum; alleen verkleinen als de echte tekst niet past.
+ */
+
+
+/* === DISPLAY HEADER/TITLE FONT FIX V45 ===
+   Header en title hebben een eigen normale basisgrootte.
+   tenant_screen.js schaalt deze zones niet meer via W-autofit.
+*/
+.tenant-radio-page #header_bar_text {
+    font-size: clamp(12px, 2.7cqh, 32px);
+    line-height: 1.15;
+}
+
+.tenant-radio-page #title_status,
+.tenant-radio-page #title_presence {
+    font-size: clamp(11px, 2.3cqh, 28px);
+    line-height: 1.15;
+}
+
+/* Staff/superuser beheerlink op de productie-radio. */
+.radio-admin-button{position:fixed;z-index:12000;right:max(6px,env(safe-area-inset-right));bottom:max(6px,env(safe-area-inset-bottom));padding:6px 10px;border:1px solid rgba(255,255,255,.65);border-radius:6px;background:rgba(0,31,63,.86);color:#fff;font:800 12px/1.1 Arial,sans-serif;text-decoration:none;box-shadow:0 2px 8px rgba(0,0,0,.35)}
+.radio-admin-button:hover,.radio-admin-button:focus-visible{background:#0d4f82;outline:2px solid #fff;outline-offset:1px}
+
+/* Linked-channel presence indicator in the radio title bar. */
+.title-presence-linked[hidden]{
+    display:none !important;
+}
+.title-presence-linked{
+    min-width:auto;
+}
+
+/* RX primary line: primary radio channel + flowchart + other linked channels. */
+#primairy_txt{
+    display:flex;
+    align-items:center;
+    min-width:0;
+    gap:.34em;
+}
+.runtime-primary-channel{
+    flex:0 0 auto;
+    font-weight:inherit;
+}
+.runtime-primary-link-icon{
+    flex:0 0 auto;
+    font-size:.92em;
+    line-height:1;
+}
+.runtime-primary-linked-channels{
+    min-width:0;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    font-size:.82em;
+    font-weight:600;
+}
+
+/* Private Call is alleen paars zolang er daadwerkelijk wordt gebeld of het
+   gesprek actief is. In idle/ended/declined volgt dit scherm dezelfde neutrale
+   light/dark displaykleuren als ieder ander detailscherm. */
+.radio-screen[data-screen-type="private_call"].is-private-call,
+.radio-screen[data-screen-type="private_call"][data-radio-state="private-call"]{
+    --display-bg:#4D007A;
+    --display-fg:#ffffff;
+    --display-border:#350055;
+    background:#4D007A!important;
+    color:#fff!important;
+    border-color:#350055!important;
+    box-shadow:inset 0 0 28px rgba(0,0,0,.22),0 0 16px rgba(77,0,122,.38)!important;
+}
+.radio-screen[data-screen-type="private_call"].is-private-call .header-bar,
+.radio-screen[data-screen-type="private_call"].is-private-call .title-bar{
+    background:#350055!important;
+    color:#fff!important;
+    border-color:#7200b5!important;
+}
+.radio-screen[data-screen-type="private_call"].is-private-call .screen-content,
+.radio-screen[data-screen-type="private_call"].is-private-call .detail-screen,
+.radio-screen[data-screen-type="private_call"].is-private-call .list-screen{
+    background:#4D007A!important;
+    color:#fff!important;
+}
+
+
+/* =========================================================
+   RESPONSIVE RADIO AREA
+   Portrait behoudt de bestaande vier verticale areas.
+   Landscape splitst uitsluitend de radio-area in twee kolommen:
+   links DISPLAY / NAVIGATION (32:20), rechts KEYPAD / SOFTRADIO (32:8).
+   Binnen elke kolom worden de verhoudingen over de volledige beschikbare
+   hoogte genormaliseerd (links 61.54/38.46%, rechts 80/20%).
+   ========================================================= */
+.radio-column {
+    display: contents;
+}
+
+@media (orientation: landscape) {
+    .radio-device {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+        grid-template-rows: minmax(0, 1fr) !important;
+        /* Exact dezelfde ruimte als tussen twee keypad-toetsen. */
+        column-gap: var(--hardware-shell-gap, var(--radio-section-gap, calc(var(--radio-key-gap, clamp(3px, 0.55vmin, 7px)) * 2))) !important;
+        row-gap: 0;
+    }
+
+    .radio-column {
+        display: grid;
+        min-width: 0;
+        min-height: 0;
+        height: 100%;
+        overflow: hidden;
+        gap: var(--device-gap);
+    }
+
+    /* Een volledig lege kolom neemt in landscape geen enkele ruimte in. */
+    .radio-column[hidden] {
+        display: none !important;
+    }
+
+    /* Als links of rechts volledig leeg is, wordt de radio weer een echte
+       éénkoloms-layout. De overblijvende kolom gebruikt dan 100% van het
+       beschikbare radio-oppervlak. */
+    .radio-device.radio-single-column {
+        grid-template-columns: minmax(0, 1fr) !important;
+        column-gap: 0;
+    }
+
+    .radio-device.radio-single-column .radio-column:not([hidden]) {
+        grid-column: 1 !important;
+        grid-row: 1 !important;
+    }
+
+    .radio-column-left {
+        grid-column: 1;
+        grid-row: 1;
+        grid-template-rows: var(--left-device-rows, minmax(0, 32fr) minmax(0, 20fr));
+    }
+
+    .radio-column-right {
+        grid-column: 2;
+        grid-row: 1;
+        grid-template-rows: var(--right-device-rows, minmax(0, 32fr) minmax(0, 8fr));
+    }
+}
+
+/* =========================================================
+   UNIFIED MAIN-SECTION SPACING
+   Eén en dezelfde afstand tussen alle vier hoofdgebieden:
+   Display <-> Navigation <-> Keypad <-> Softradio.
+   Dezelfde maat wordt ook gebruikt tussen de twee landscape-kolommen,
+   zodat alle zichtbare scheidingen exact gelijk zijn.
+   ========================================================= */
+.tenant-radio-page .radio-device {
+    --radio-main-gap: var(--hardware-shell-gap, clamp(.35rem, 1vmin, 1rem));
+    row-gap: var(--radio-main-gap) !important;
+    column-gap: 0 !important;
+}
+
+@media (orientation: landscape) {
+    .tenant-radio-page .radio-device {
+        column-gap: var(--radio-main-gap) !important;
+        row-gap: 0 !important;
+    }
+
+    .tenant-radio-page .radio-column {
+        gap: var(--radio-main-gap) !important;
+    }
+
+    .tenant-radio-page .radio-device.radio-single-column {
+        column-gap: 0 !important;
+    }
+}

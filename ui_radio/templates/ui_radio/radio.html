@@ -1,0 +1,110 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#111315">
+    <title>{{ radio_user.display_name|default:"Radio" }}</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:FILL@0..1&display=swap">
+    <link rel="stylesheet" href="{% static 'ui_radio/tenant_screen.css' %}?v=20260910-location-ptt-v2">
+</head>
+<body class="tenant-radio-page">
+<!--
+    Productierenderer voor /radio/<tenant>/.
+
+    Alleen secties met usemode=visible worden getoond. De renderer verdeelt
+    de volledige beschikbare ruimte opnieuw over de zichtbare hoofdsecties.
+    Hardware-key definities gebruiken in productie dezelfde Action Dispatcher
+    als zichtbare knoppen. Dev-schermen blijven hardwarekeys negeren.
+-->
+<div class="tenant-hardware-stage">
+    <div class="dev-hardware-shell" id="dev-hardware-shell">
+        <section class="external-top-keys" id="external-top-keys" aria-label="Boventoetsen"></section>
+        <section class="external-side-keys external-left-keys" id="external-left-keys" aria-label="Linkertoetsen"></section>
+
+        <main class="radio-device" id="radio-device">
+            <div class="radio-column radio-column-left">
+                <section class="display-section" id="display-section" aria-label="Radioscherm">
+                    <div class="radio-screen" id="radio-screen">
+                        <div class="header-bar" id="header_bar" aria-label="Radionaam">
+                            <span id="header_bar_text">{{ radio_user.display_name|default:"Radio" }}</span>
+                        </div>
+
+                        <div class="title-bar" id="title_bar" aria-label="Status en kanaalaanwezigheid">
+                            <span class="title-status" id="title_status"></span>
+                            <span class="title-presence" id="title_presence">
+                                <span class="title-presence-group" title="Verbonden radio's">
+                                    <span class="material-symbols-outlined" aria-hidden="true">mobile</span>
+                                    <span id="title_presence_radios">0</span>
+                                </span>
+                                <span class="title-presence-group" title="Luisterende dispatchers">
+                                    <span class="material-symbols-outlined" aria-hidden="true">support_agent</span>
+                                    <span id="title_presence_dispatchers">0</span>
+                                </span>
+                                <span class="title-presence-group title-presence-linked" id="title_presence_linked" title="Gekoppelde kanaalgroep" hidden>
+                                    <span class="material-symbols-outlined" aria-hidden="true">flowchart</span>
+                                </span>
+                            </span>
+                        </div>
+
+                        <div class="screen-content" id="screen-content">
+                            <div class="detail-screen" id="detail-screen">
+                                <div class="primairy-txt" id="primairy_txt"></div>
+                                <div class="secundairy-text" id="secundairy_text" aria-live="polite"></div>
+                            </div>
+
+                            <div class="list-screen" id="list-screen" hidden>
+                                <div class="screen-list" id="screen-list" role="listbox" aria-label="Schermen"></div>
+                            </div>
+                        </div>
+
+                        <div class="softkey-panel" id="softkey-panel" aria-label="Softkeys"></div>
+                    </div>
+                </section>
+
+                <section class="navigation-section" id="navigation-section" aria-label="Navigatietoetsen">
+                    <div class="navigation-grid" id="navigation-grid"></div>
+                </section>
+
+            </div>
+            <div class="radio-column radio-column-right">
+                <section class="keypad-section" id="keypad-section" aria-label="Toetsenbord">
+                    <div id="keypad-host" class="keypad-host"></div>
+                </section>
+
+                <section class="softradio-section" id="softradio-section" aria-label="Softradio">
+                    <div id="softradio-host" class="softradio-host"></div>
+                </section>            </div>
+        </main>
+
+        <section class="external-side-keys external-right-keys" id="external-right-keys" aria-label="Rechtertoetsen"></section>
+    </div>
+</div>
+{% if request.user.is_staff or request.user.is_superuser %}
+<a class="radio-admin-button" href="{% url 'admin:index' %}" aria-label="Open beheer">Admin</a>
+{% endif %}
+
+{{ screen_config|json_script:"button-config" }}
+<script>
+    window.RADIO_TENANT = "{{ tenant_slug|escapejs }}";
+    window.RADIO_USER = {
+        id: {{ radio_user.pk }},
+        name: "{{ radio_user.display_name|escapejs }}",
+        tenant: "{{ tenant_slug|escapejs }}",
+        debug: {{ radio_user.debug|yesno:"true,false" }}
+    };
+</script>
+<script src="{% static 'ui_radio/radio_press.js' %}?v=20260922-heartbeat-channel-sync-v1" defer></script>
+<script src="{% static 'ui_radio/radio_api.js' %}?v=20260922-heartbeat-channel-sync-v1" defer></script>
+<script src="{% static 'ui_radio/radio_input.js' %}?v=20260922-heartbeat-channel-sync-v1" defer></script>
+<script src="{% static 'ui_radio/radio_hardware.js' %}?v=20260922-heartbeat-channel-sync-v1" defer></script>
+<script src="https://cdn.jsdelivr.net/npm/livekit-client@2.22.0/dist/livekit-client.umd.min.js" defer></script>
+<script src="{% static 'ui_radio/livekit_media.js' %}?v=20260923-old-route-v1" defer></script>
+<script src="{% static 'ui_radio/tenant_actions.js' %}?v=20260922-testclock-reloadstorm-v1" defer></script>
+<script src="{% static 'ui_radio/tenant_screen.js' %}?v=20260922-heartbeat-channel-sync-v1" defer></script>
+</body>
+</html>

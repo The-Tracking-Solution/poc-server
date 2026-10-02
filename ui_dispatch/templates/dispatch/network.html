@@ -1,0 +1,13 @@
+{% extends "dispatch/base.html" %}
+{% load static %}
+
+{% block title %}Netwerk – {{ tenant.name }}{% endblock %}
+{% block body_class %}dispatch-network-page{% endblock %}
+
+{% block content %}
+{% include "dispatch/_network_content.html" with network_inline=False %}
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'dispatch/js/network.js' %}?v=20260914-network-equal-columns-v1" defer></script>
+{% endblock %}

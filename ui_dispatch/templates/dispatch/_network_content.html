@@ -1,0 +1,21 @@
+<main class="dispatch-network{% if network_inline %} dispatch-network-inline{% endif %}" aria-label="Dispatch netwerk">
+  <section class="network-toolbar network-toolbar-compact">
+    <small class="network-help-text">Sleep een radio naar een ander kanaal om het kanaal te wijzigen. Sleep een kanaaltitel naar een ander kanaal of een linkgroep.</small>
+    <div id="networkFeedback" class="network-feedback{% if network_inline %} network-feedback-inline{% endif %}" role="status" aria-live="polite"></div>
+  </section>
+
+  <div class="network-radio-filter" role="group" aria-label="Radiofilter">
+    <span class="network-radio-filter-label">Radio's</span>
+    <button type="button" class="network-radio-filter-button active" data-network-radio-filter="online" aria-pressed="true">Online</button>
+    <button type="button" class="network-radio-filter-button" data-network-radio-filter="all" aria-pressed="false">Alles</button>
+    <button type="button" class="network-radio-filter-button" data-network-radio-filter="hidden" aria-pressed="false">Verberg</button>
+  </div>
+
+  <div class="network-board" aria-label="Netwerkoverzicht">
+    <div id="networkChannelGrid" class="network-channel-grid" aria-live="polite"></div>
+    <aside id="networkLinkGroups" class="network-linkgroups" aria-label="Linkgroepen">
+      <div id="networkLinkGroupsCards"></div>
+      <section id="networkPrivateCalls" class="network-private-calls" aria-label="Privégesprekken" hidden></section>
+    </aside>
+  </div>
+</main>

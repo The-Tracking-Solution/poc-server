@@ -1,0 +1,26 @@
+.button-config-editor{max-width:1700px}.bce-intro{margin-bottom:14px;padding:12px;border:1px solid var(--hairline-color,#ddd);border-radius:6px;background:var(--darkened-bg,#f8f8f8)}.bce-intro .help{font-size:12px;color:var(--body-quiet-color,#666);margin-top:3px}.bce-message{padding:10px;margin-bottom:12px;border-radius:5px}.bce-message.error{background:#fff1f1;color:#ba2121;border:1px solid #f0b8b8}.bce-section{margin-bottom:16px;border:1px solid var(--hairline-color,#ddd);border-radius:6px;overflow:hidden}.bce-section h3{margin:0;padding:10px 12px;background:var(--darkened-bg,#f8f8f8);border-bottom:1px solid var(--hairline-color,#ddd);font-size:14px}.bce-section-body{padding:12px}.bce-section-settings{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px 18px;margin-bottom:12px}.bce-field{display:flex;flex-direction:column;min-width:0}.bce-field span{font-weight:600;margin-bottom:4px}.bce-field input,.bce-field select{box-sizing:border-box;width:100%;min-height:34px}.bce-table-wrap{overflow:auto;margin-bottom:10px}.bce-key-table{width:100%;border-collapse:collapse;min-width:1450px}.bce-key-table th,.bce-key-table td{padding:7px;border:1px solid var(--hairline-color,#ddd);vertical-align:top}.bce-key-table th{background:var(--darkened-bg,#f8f8f8);white-space:nowrap;text-align:left}.bce-key-table input,.bce-key-table select,.bce-key-table textarea{width:100%;box-sizing:border-box;min-height:32px}.bce-key-table textarea{font-family:monospace;min-width:210px}.bce-key-table input[readonly]{background:var(--darkened-bg,#f3f3f3)}.bce-color-cell{white-space:nowrap}.bce-color-cell input[type=color]{width:58px;vertical-align:middle}.bce-clear-color{margin-left:4px;padding:4px 9px}.bce-remove-row{white-space:nowrap}.bce-empty td{text-align:center;color:var(--body-quiet-color,#777);padding:18px}.bce-json-details{margin-top:14px;border-top:1px solid var(--hairline-color,#ddd);padding-top:10px}.bce-json-details summary{cursor:pointer;font-weight:600}.bce-json-content{padding-top:10px}.bce-json-details textarea{width:100%;box-sizing:border-box;font-family:monospace;margin:0}.bce-json-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+
+/* Externe hardwaregroepen en rotary-regels. */
+.bce-section-note{margin:0 0 10px;color:var(--body-quiet-color,#666);font-size:12px}.bce-key-table .bce-rotary-hw{min-width:125px}.bce-key-table .bce-rotary-action{min-width:150px}.bce-key-table .bce-rotary-params{min-width:170px}.bce-add-row[disabled]{opacity:.55;cursor:not-allowed}
+
+/* Short/long press editor */
+.bce-key-table{min-width:1650px}
+.bce-press-help{display:block;margin-top:4px;font-size:10px;color:var(--body-quiet-color,#777);white-space:nowrap}
+.bce-no-params{display:block;padding:7px 4px;color:var(--body-quiet-color,#777);font-size:11px;white-space:nowrap}
+.bce-press-rules p{margin:0;line-height:1.45}
+
+/* Top keys split: TK1-TK6 buttons and TK7-TK8 rotary controls. */
+.bce-subtable-title{margin:16px 0 8px;font-size:13px;font-weight:700}.bce-subtable-title:first-of-type{margin-top:6px}.bce-topkey-buttons{min-width:1650px}.bce-topkey-rotary{min-width:2200px}
+
+.bce-add-specific {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-top: 10px;
+}
+.bce-add-specific .bce-key-choice {
+  min-width: 180px;
+}
+.bce-remove-override {
+  white-space: nowrap;
+}

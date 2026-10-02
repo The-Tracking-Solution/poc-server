@@ -1,0 +1,42 @@
+<div class="button-config-editor"
+     data-screen-config-editor data-editor-scope="{{ widget.editor_scope|default:'full' }}"
+     data-screen-choices="{{ widget.screen_choices_json|escape }}"
+     data-channel-choices="{{ widget.channel_choices_json|escape }}"
+     data-status-choices="{{ widget.status_choices_json|escape }}"
+     data-action-choices="{{ widget.action_choices_json|escape }}"
+     data-parent-configs="{{ widget.parent_configs_json|default:'{}'|escape }}"
+     data-parent-select-id="{{ widget.parent_select_id|default:''|escape }}">
+
+  <div class="bce-intro">
+    <strong>{% if widget.editor_scope == "override" %}Configuratie-laag{% elif widget.editor_scope == "topkeys" %}Top-key override{% else %}Visuele hardwareconfiguratie{% endif %}</strong>
+    <div class="help">
+      {% if widget.editor_scope == "override" %}Kies per sectie alleen de knoppen die op dit niveau moeten afwijken. Niet gekozen knoppen worden automatisch overgenomen uit de bovenliggende configuratie. Alleen knoppen uit HardwareConfig kunnen worden toegevoegd.{% elif widget.editor_scope == "topkeys" %}Wijzig hier de Top keys die op dit niveau afwijken. Andere JSON-overrides blijven behouden.{% else %}Wijzig de schermvelden en knoppen via de tabellen. Alles wordt automatisch als JSON opgeslagen.{% endif %}
+    </div>
+  </div>
+
+  <div class="bce-message" data-bce-message hidden></div>
+
+  <div data-bce-visual></div>
+
+  <details class="bce-json-details">
+    <summary>Geavanceerd: ruwe JSON</summary>
+
+    <div class="bce-json-content">
+      {% include "django/forms/widgets/textarea.html" %}
+
+      <div class="bce-json-actions">
+        <button type="button"
+                class="button"
+                data-bce-action="reload">
+          JSON opnieuw laden
+        </button>
+
+        <button type="button"
+                class="button"
+                data-bce-action="format">
+          JSON formatteren
+        </button>
+      </div>
+    </div>
+  </details>
+</div>

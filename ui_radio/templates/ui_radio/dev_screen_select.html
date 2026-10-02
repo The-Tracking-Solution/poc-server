@@ -1,0 +1,28 @@
+{% load static %}
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Kies scherm</title>
+  <link rel="stylesheet" href="{% static 'ui_radio/dev_screen_select.css' %}">
+</head>
+<body>
+  <main class="profile-picker">
+    <h1>Kies een scherm</h1>
+    <p>Een schermconfiguratie is gekoppeld aan een tenant en kan door meerdere hardwareprofielen worden gebruikt.</p>
+    <form method="post">
+      {% csrf_token %}
+      <label for="screen">Scherm</label>
+      <select id="screen" name="screen" required>
+        <option value="">Maak een keuze</option>
+        {% for screen in screens %}
+          <option value="{{ screen.pk }}">{{ screen.tenant.name }} — {{ screen.name }}</option>
+        {% endfor %}
+      </select>
+      <button type="submit">Open scherm</button>
+    </form>
+  </main>
+  <script src="{% static 'engine_main/dpad_navigation.js' %}?v=20260916-dpad-all-pages-v1"></script>
+</body>
+</html>
