@@ -136,10 +136,15 @@
       const response=await fetch(endpoint,{credentials:"same-origin",cache:"no-store"});
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const data=await response.json();
+      if (data.error) {
+        const detail = [data.error.type, data.error.message].filter(Boolean).join(": ");
+        throw new Error(detail || "Diagnostiekgegevens konden niet worden opgehaald.");
+      }
       grid.innerHTML=(data.sessions || []).map(card).join("") || "<p>Geen radiosessies gevonden.</p>";
       updated.textContent="laatst bijgewerkt: "+new Date().toLocaleTimeString();
     } catch (error) {
       updated.textContent="fout: "+error.message;
+      grid.innerHTML="<p class=\"diag-bad\" role=\"alert\">Diagnostiek kon niet worden bijgewerkt: "+esc(error.message)+"</p>";
     }
   }
   document.getElementById("diag-refresh").addEventListener("click",refresh);

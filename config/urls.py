@@ -3,10 +3,13 @@ from django.urls import include, path
 from django.views.generic import RedirectView
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 from engine_poc.health import health_view
+from engine_poc.diagnostics import radio_diagnostics, radio_diagnostics_data
 from engine_main import views as engine_main_views
 
 urlpatterns = [
     path("health/", health_view, name="health"),
+    path("admin/radio-diagnostics/", radio_diagnostics, name="radio-diagnostics"),
+    path("admin/radio-diagnostics/data/", radio_diagnostics_data, name="radio-diagnostics-data"),
     path("admin/", admin.site.urls),
     path("poc/api/v1/", include("engine_poc.urls")),
     path("poc/openapi/", SpectacularAPIView.as_view(), name="poc-openapi"),
