@@ -2,6 +2,7 @@ import logging
 
 from django.contrib.admin.views.decorators import staff_member_required
 from django.http import JsonResponse
+from django.db.models import Case, F, IntegerField, Value, When
 from django.shortcuts import render
 from django.utils import timezone
 
@@ -23,6 +24,13 @@ def radio_diagnostics_data(request):
         rows = (
             DeviceSession.objects
             .filter(radio_user__isnull=False)
+            .annotate(
+                diagnostics_active=Case(
+                    When(status=DeviceSession.Status.ACTIVE, then=Value(1)),
+                    default=Value(0),
+                    output_field=IntegerField(),
+                ),
+            )
             .values(
                 "id",
                 "tenant_id",
@@ -43,12 +51,14 @@ def radio_diagnostics_data(request):
             .order_by(
                 "tenant__slug",
                 "radio_user__external_name",
-                "-last_heartbeat_at_ms",
+                "-diagnostics_active",
+                F("last_heartbeat_at_ms").desc(nulls_last=True),
                 "-id",
             )
         )
 
-        # Eén kaart per radio: alleen de meest recente sessie.
+        # Eén kaart per radio: actieve sessies eerst, daarna nieuwste heartbeat.
+        # PostgreSQL sorteert NULL anders vooraan bij aflopende tijdstippen.
         latest = {}
         for row in rows:
             key = (row["tenant_id"], row["radio_user_id"])
