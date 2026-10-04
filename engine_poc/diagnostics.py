@@ -23,7 +23,7 @@ def radio_diagnostics_data(request):
     try:
         rows = (
             DeviceSession.objects
-            .filter(radio_user__isnull=False)
+            .filter(radio_user__isnull=False, radio_user__debug=True)
             .annotate(
                 diagnostics_active=Case(
                     When(status=DeviceSession.Status.ACTIVE, then=Value(1)),
